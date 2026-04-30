@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能研报 - 金融服务平台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: {
+                            bg: '#0F172A',
+                            surface: '#1E293B',
+                            card: '#334155',
+                            text: '#F8FAFC',
+                            muted: '#94A3B8'
+                        },
+                        neon: {
+                            blue: '#3B82F6',
+                            purple: '#8B5CF6',
+                            green: '#10B981',
+                            red: '#EF4444',
+                            cyan: '#06B6D4'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    boxShadow: {
+                        'neon-blue': '0 0 10px rgba(59, 130, 246, 0.5)',
+                        'neon-purple': '0 0 10px rgba(139, 92, 246, 0.5)',
+                        'card': '0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.15)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0F172A;
+            color: #F8FAFC;
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1E293B; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #475569; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748B; 
+        }
+
+        /* Markdown Styles */
+        .markdown-body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.7;
+        }
+        .markdown-body h1 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+            color: #F8FAFC;
+            border-bottom: 2px solid #334155;
+            padding-bottom: 0.5rem;
+        }
+        .markdown-body h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: #E2E8F0;
+            display: flex;
+            align-items: center;
+        }
+        .markdown-body h2::before {
+            content: '#';
+            color: #8B5CF6;
+            margin-right: 0.5rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .markdown-body h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-top: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: #CBD5E1;
+        }
+        .markdown-body p {
+            margin-bottom: 1rem;
+            color: #CBD5E1;
+        }
+        .markdown-body ul {
+            list-style-type: disc;
+            padding-left: 1.5rem;
+            margin-bottom: 1rem;
+            color: #CBD5E1;
+        }
+        .markdown-body ol {
+            list-style-type: decimal;
+            padding-left: 1.5rem;
+            margin-bottom: 1rem;
+            color: #CBD5E1;
+        }
+        .markdown-body blockquote {
+            border-left: 4px solid #3B82F6;
+            background: rgba(59, 130, 246, 0.1);
+            padding: 0.75rem 1rem;
+            margin: 1rem 0;
+            border-radius: 0 0.5rem 0.5rem 0;
+            color: #93C5FD;
+            font-style: italic;
+        }
+        .markdown-body code {
+            background: #1E293B;
+            color: #F472B6;
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.25rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9em;
+        }
+        .markdown-body pre {
+            background: #0F172A;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+            border: 1px solid #334155;
+        }
+        .markdown-body pre code {
+            background: transparent;
+            color: #E2E8F0;
+            padding: 0;
+        }
+        .markdown-body strong {
+            color: #38BDF8;
+            font-weight: 700;
+        }
+        .markdown-body table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+            background: #1E293B;
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+        .markdown-body th, .markdown-body td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #334155;
+            text-align: left;
+        }
+        .markdown-body th {
+            background: #334155;
+            color: #F8FAFC;
+            font-weight: 600;
+        }
+        .markdown-body tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Animations */
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 1; box-shadow: 0 0 15px rgba(139, 92, 246, 0.3); }
+            50% { opacity: 0.8; box-shadow: 0 0 5px rgba(139, 92, 246, 0.1); }
+        }
+        .animate-pulse-glow {
+            animation: pulse-glow 2s infinite;
+        }
+        
+        @keyframes fade-in-up {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fade-in-up 0.5s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="font-sans min-h-screen flex flex-col antialiased">
+    <!-- Navbar -->
+    <header class="bg-dark-surface/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-700">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer group" onclick="window.location.href='/'">
+                <div class="bg-gradient-to-tr from-neon-blue to-neon-purple p-2 rounded-lg shadow-lg group-hover:shadow-neon-blue transition-all duration-300">
+                    <i class="fa fa-line-chart text-white text-xl"></i>
+                </div>
+                <h1 class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400 font-mono tracking-tight">QUANT<span class="text-neon-blue">.AI</span></h1>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="hidden md:flex items-center px-3 py-1 bg-dark-bg rounded-full border border-gray-700">
+                    <div class="w-2 h-2 rounded-full bg-green-500 mr-2 animate-pulse"></div>
+                    <span class="text-xs text-gray-400 font-mono">SYSTEM ONLINE</span>
+                </div>
+                <div class="h-6 w-px bg-gray-700"></div>
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-neon-purple to-neon-blue flex items-center justify-center text-xs font-bold shadow-lg">
+                        {{ username[0] | upper }}
+                    </div>
+                    <span class="text-sm text-gray-300 hidden sm:inline">{{ username }}</span>
+                </div>
+                <a href="/" class="text-gray-400 hover:text-white transition-colors text-sm">
+                    <i class="fa fa-home"></i>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto px-4 py-8">
+        
+        <!-- Header Section -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 animate-fade-in" style="animation-delay: 0.1s;">
+            <div>
+                <h2 class="text-3xl font-bold text-white mb-2 flex items-center">
+                    <span class="bg-clip-text text-transparent bg-gradient-to-r from-neon-cyan to-neon-blue">智能研报中心</span>
+                    <span class="ml-3 text-xs bg-neon-purple/20 text-neon-purple px-2 py-1 rounded border border-neon-purple/30 font-mono">BETA</span>
+                </h2>
+                <p class="text-dark-muted max-w-xl">
+                    基于深度学习与自然语言处理技术，实时分析市场情绪与龙头股动向。
+                    <span class="hidden md:inline text-gray-500">数据来源：Telegram 实时聊天流。</span>
+                </p>
+            </div>
+            <button id="runAnalysisBtn" class="mt-4 md:mt-0 bg-gradient-to-r from-neon-blue to-neon-purple hover:from-blue-500 hover:to-purple-500 text-white px-6 py-3 rounded-xl shadow-neon-blue transition-all duration-300 transform hover:scale-105 flex items-center space-x-2 font-semibold">
+                <i class="fa fa-bolt"></i>
+                <span>启动深度分析</span>
+            </button>
+            <button id="refreshDataBtn" class="ml-4 mt-4 md:mt-0 bg-dark-card hover:bg-gray-600 text-white px-4 py-3 rounded-xl border border-gray-600 transition-all duration-300 flex items-center space-x-2">
+                <i class="fa fa-refresh"></i>
+                <span>刷新报告</span>
+            </button>
+        </div>
+
+        <!-- Status Bar -->
+        <div id="statusMessage" class="hidden mb-8 p-4 rounded-xl border animate-fade-in"></div>
+
+        <!-- Vertical Layout -->
+        <div class="flex flex-col gap-12 max-w-5xl mx-auto">
+            
+            <!-- Card 0: Daily Intelligence -->
+            <div class="bg-dark-surface rounded-2xl shadow-card border border-gray-700 overflow-hidden flex flex-col min-h-[600px] animate-fade-in relative group" style="animation-delay: 0.15s;">
+                <!-- Glowing effect -->
+                <div class="absolute -inset-0.5 bg-gradient-to-r from-neon-cyan to-neon-blue opacity-20 group-hover:opacity-40 transition duration-500 blur-lg"></div>
+                <div class="relative flex flex-col h-full bg-dark-surface rounded-2xl">
+                    
+                    <div class="p-5 border-b border-gray-700 flex justify-between items-center bg-dark-bg/50 backdrop-blur">
+                        <div class="flex items-center space-x-3">
+                            <div class="p-2 bg-neon-cyan/10 rounded-lg">
+                                <i class="fa fa-newspaper-o text-neon-cyan text-lg"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-white">每日市场情报</h3>
+                                <p class="text-xs text-dark-muted font-mono">DAILY INTELLIGENCE</p>
+                            </div>
+                        </div>
+                        <span id="briefingDate" class="text-xs text-neon-cyan bg-neon-cyan/10 px-2 py-1 rounded border border-neon-cyan/20 font-mono">waiting...</span>
+                    </div>
+                    
+                    <div class="p-6 overflow-y-auto flex-grow custom-scrollbar">
+                        <div id="briefingContent">
+                            <div class="flex flex-col items-center justify-center h-full text-dark-muted space-y-4">
+                                <div class="w-16 h-16 border-4 border-gray-700 border-t-neon-cyan rounded-full animate-spin hidden" id="briefingLoading"></div>
+                                <i class="fa fa-rss text-6xl opacity-20" id="briefingIcon"></i>
+                                <span id="briefingPlaceholder" class="font-mono text-sm">Waiting for daily briefing...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 1: Market Sentiment -->
+            <div class="bg-dark-surface rounded-2xl shadow-card border border-gray-700 overflow-hidden flex flex-col min-h-[600px] animate-fade-in relative group" style="animation-delay: 0.2s;">
+                <!-- Glowing effect -->
+                <div class="absolute -inset-0.5 bg-gradient-to-r from-neon-blue to-neon-purple opacity-20 group-hover:opacity-40 transition duration-500 blur-lg"></div>
+                <div class="relative flex flex-col h-full bg-dark-surface rounded-2xl">
+                    
+                    <div class="p-5 border-b border-gray-700 flex justify-between items-center bg-dark-bg/50 backdrop-blur">
+                        <div class="flex items-center space-x-3">
+                            <div class="p-2 bg-neon-blue/10 rounded-lg">
+                                <i class="fa fa-globe text-neon-blue text-lg"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-white">市场情绪周报</h3>
+                                <p class="text-xs text-dark-muted font-mono">MARKET SENTIMENT</p>
+                            </div>
+                        </div>
+                        <span id="sentimentDate" class="text-xs text-neon-cyan bg-neon-cyan/10 px-2 py-1 rounded border border-neon-cyan/20 font-mono">waiting...</span>
+                    </div>
+                    
+                    <div class="p-6 overflow-y-auto flex-grow custom-scrollbar">
+                        <div id="sentimentContent" class="markdown-body">
+                            <div class="flex flex-col items-center justify-center h-full text-dark-muted space-y-4">
+                                <div class="w-16 h-16 border-4 border-gray-700 border-t-neon-blue rounded-full animate-spin hidden" id="sentimentLoading"></div>
+                                <i class="fa fa-bar-chart text-6xl opacity-20" id="sentimentIcon"></i>
+                                <span id="sentimentPlaceholder" class="font-mono text-sm">Waiting for data stream...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2: Market Direction & Sector Analysis -->
+            <div class="bg-dark-surface rounded-2xl shadow-card border border-gray-700 overflow-hidden flex flex-col min-h-[600px] animate-fade-in relative group" style="animation-delay: 0.3s;">
+                <!-- Glowing effect -->
+                <div class="absolute -inset-0.5 bg-gradient-to-r from-neon-purple to-neon-red opacity-20 group-hover:opacity-40 transition duration-500 blur-lg"></div>
+                <div class="relative flex flex-col h-full bg-dark-surface rounded-2xl">
+                    
+                    <div class="p-5 border-b border-gray-700 flex justify-between items-center bg-dark-bg/50 backdrop-blur">
+                        <div class="flex items-center space-x-3">
+                            <div class="p-2 bg-neon-purple/10 rounded-lg">
+                                <i class="fa fa-compass text-neon-purple text-lg"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-white">市场方向与板块热点</h3>
+                                <p class="text-xs text-dark-muted font-mono">SECTOR & TREND ANALYSIS</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                             <span class="w-2 h-2 bg-neon-red rounded-full animate-pulse"></span>
+                             <span class="text-xs text-gray-400 font-mono">AI GENERATED</span>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6 overflow-y-auto flex-grow custom-scrollbar">
+                        <div id="leaderContent" class="markdown-body">
+                             <div class="flex flex-col items-center justify-center h-full text-dark-muted space-y-4">
+                                <div class="w-16 h-16 border-4 border-gray-700 border-t-neon-purple rounded-full animate-spin hidden" id="leaderLoading"></div>
+                                <i class="fa fa-pie-chart text-6xl opacity-20" id="leaderIcon"></i>
+                                <span id="leaderPlaceholder" class="font-mono text-sm">Waiting for analysis...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="bg-dark-surface border-t border-gray-800 mt-12 py-8">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-dark-muted text-sm font-mono">&copy; 2026 QUANT.AI | POWERED BY LLM ENGINE</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            loadReports();
+
+            document.getElementById('runAnalysisBtn').addEventListener('click', function() {
+                runAnalysis();
+            });
+            
+            document.getElementById('refreshDataBtn').addEventListener('click', function() {
+                loadReports();
+            });
+        });
+
+        function showStatus(message, type) {
+            const el = document.getElementById('statusMessage');
+            
+            let bgClass, borderClass, textClass, icon;
+            if (type === 'success') {
+                bgClass = 'bg-green-900/20';
+                borderClass = 'border-green-500/50';
+                textClass = 'text-green-400';
+                icon = 'fa-check-circle';
+            } else if (type === 'error') {
+                bgClass = 'bg-red-900/20';
+                borderClass = 'border-red-500/50';
+                textClass = 'text-red-400';
+                icon = 'fa-exclamation-triangle';
+            } else {
+                bgClass = 'bg-blue-900/20';
+                borderClass = 'border-blue-500/50';
+                textClass = 'text-blue-400';
+                icon = 'fa-info-circle';
+            }
+            
+            el.className = `mb-8 p-4 rounded-xl border flex items-center space-x-3 animate-fade-in ${bgClass} ${borderClass} ${textClass}`;
+            el.innerHTML = `<i class="fa ${icon} text-xl"></i><span>${message}</span>`;
+            el.classList.remove('hidden');
+        }
+
+        function runAnalysis() {
+            const btn = document.getElementById('runAnalysisBtn');
+            const originalHTML = btn.innerHTML;
+            
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa fa-circle-o-notch fa-spin"></i> <span>Initializing Protocol...</span>';
+            btn.classList.add('opacity-75', 'cursor-not-allowed');
+
+            fetch('/api/run-stock-analysis', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showStatus('任务已启动。系统正在后台处理海量数据，请稍后刷新查看。', 'success');
+                } else {
+                    showStatus('启动失败: ' + data.message, 'error');
+                }
+            })
+            .catch(error => {
+                showStatus('网络请求异常: ' + error.message, 'error');
+            })
+            .finally(() => {
+                setTimeout(() => {
+                    btn.disabled = false;
+                    btn.innerHTML = originalHTML;
+                    btn.classList.remove('opacity-75', 'cursor-not-allowed');
+                }, 3000);
+            });
+        }
+
+        function loadReports() {
+            const sentimentContent = document.getElementById('sentimentContent');
+            const leaderContent = document.getElementById('leaderContent');
+            const briefingContent = document.getElementById('briefingContent');
+            const sentimentDate = document.getElementById('sentimentDate');
+            const briefingDate = document.getElementById('briefingDate');
+            const refreshBtn = document.getElementById('refreshDataBtn');
+            
+            if(refreshBtn) {
+                const originalIcon = refreshBtn.innerHTML;
+                refreshBtn.innerHTML = '<i class="fa fa-refresh fa-spin"></i> <span>刷新中...</span>';
+                refreshBtn.disabled = true;
+            }
+            
+            // Add timestamp to prevent browser caching
+            fetch('/api/get-stock-reports?t=' + new Date().getTime())
+            .then(response => {
+                if (response.status === 401) {
+                    window.location.href = '/';
+                    return;
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Render Daily Briefing
+                    if (data.data.daily_briefing && !data.data.daily_briefing.startsWith("No")) {
+                        // daily_briefing is already HTML, not markdown
+                        briefingContent.innerHTML = data.data.daily_briefing;
+                        briefingDate.textContent = 'UPDATED';
+                    } else {
+                        briefingContent.innerHTML = '<div class="flex flex-col items-center justify-center h-64 text-dark-muted"><i class="fa fa-inbox text-4xl mb-4 opacity-50"></i><p>暂无每日情报</p></div>';
+                        briefingDate.textContent = 'NO DATA';
+                    }
+
+                    // Render Sentiment Report
+                    if (data.data.market_sentiment && !data.data.market_sentiment.startsWith("No")) {
+                        sentimentContent.innerHTML = marked.parse(data.data.market_sentiment);
+                        sentimentDate.textContent = data.data.market_sentiment_title || 'LIVE UPDATE';
+                    } else {
+                        sentimentContent.innerHTML = '<div class="flex flex-col items-center justify-center h-64 text-dark-muted"><i class="fa fa-inbox text-4xl mb-4 opacity-50"></i><p>暂无市场情绪报告</p><button class="mt-4 text-neon-blue hover:underline text-sm" onclick="runAnalysis()">立即生成</button></div>';
+                    }
+
+                    // Render Sector Analysis (was Leader Stock Details)
+                    if (data.data.sector_analysis && !data.data.sector_analysis.startsWith("No")) {
+                        leaderContent.innerHTML = marked.parse(data.data.sector_analysis);
+                    } else if (data.data.leader_stock_details && !data.data.leader_stock_details.startsWith("No")) {
+                         // Fallback to old detail list if new analysis not found
+                         leaderContent.innerHTML = marked.parse(data.data.leader_stock_details);
+                    } else {
+                        leaderContent.innerHTML = '<div class="flex flex-col items-center justify-center h-64 text-dark-muted"><i class="fa fa-inbox text-4xl mb-4 opacity-50"></i><p>暂无板块方向分析</p><button class="mt-4 text-neon-purple hover:underline text-sm" onclick="runAnalysis()">立即生成</button></div>';
+                    }
+                } else {
+                    showStatus('无法获取报告数据: ' + data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                sentimentContent.innerHTML = '<div class="text-center text-red-400 mt-10">数据加载失败</div>';
+                leaderContent.innerHTML = '<div class="text-center text-red-400 mt-10">数据加载失败</div>';
+            })
+            .finally(() => {
+                if(refreshBtn) {
+                    refreshBtn.innerHTML = '<i class="fa fa-refresh"></i> <span>刷新报告</span>';
+                    refreshBtn.disabled = false;
+                }
+            });
+        }
+    </script>
+</body>
+</html>

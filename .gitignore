@@ -205,3 +205,28 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Project-local runtime state
+.codex
+.DS_Store
+.cache/
+user_data/
+
+# Playwright/browser runtime data and crawl outputs
+playwright/.DS_Store
+playwright/playwright_user_data/
+playwright/pics/
+playwright/results/
+playwright/templates/xhs_content_dynamic.html
+playwright/xhs/logs/
+playwright/xhs/pics/
+playwright/xhs/results/
+playwright/xhs/xhs/results/
+playwright/web_server/1.html
+playwright/web_server/cache/
+playwright/web_server/data/
+playwright/web_server/debug_pages/
+playwright/web_server/error_pages/
+playwright/web_server/logs/
+playwright/web_server/pic/
+playwright/web_server/search_results.json

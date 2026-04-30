@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>分析查询系统</title>
+  <!-- 引入Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- 引入Font Awesome -->
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  
+  <!-- 配置Tailwind自定义主题 -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#165DFF',
+            secondary: '#36CFC9',
+            neutral: '#F5F7FA',
+            dark: '#1D2129',
+          },
+          fontFamily: {
+            inter: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .search-container {
+        @apply transition-all duration-500 ease-out;
+      }
+      .search-container.active {
+        @apply transform -translate-y-24 md:-translate-y-32;
+      }
+      /* 结果展示区域 */
+      .result-container {
+        @apply opacity-0 max-h-0 overflow-hidden transition-all duration-500 ease-out;
+      }
+      .result-container.active {
+        @apply opacity-100 max-h-[none] mt-6;
+      }
+      .pulse-animation {
+        animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      }
+      @keyframes pulse {
+        0%, 100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+      }
+    }
+  </style>
+</head>
+<body class="font-inter bg-gradient-to-br from-neutral to-white min-h-screen flex flex-col">
+  <!-- 页面头部 -->
+  <header class="w-full py-6 px-4 md:px-8 flex justify-center">
+    <div class="max-w-6xl w-full flex justify-between items-center">
+      <div class="flex items-center space-x-2">
+        <i class="fa fa-line-chart text-primary text-2xl"></i>
+        <h1 class="text-xl md:text-2xl font-bold text-dark">分析查询系统</h1>
+      </div>
+      <div class="hidden md:flex items-center space-x-6">
+        <a href="/" class="text-gray-600 hover:text-primary transition-colors">首页</a>
+        <a href="#" class="text-gray-600 hover:text-primary transition-colors">帮助</a>
+        <a href="#" class="text-gray-600 hover:text-primary transition-colors">关于</a>
+        <a href="#" id="loginLink" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors">登录</a>
+        <div id="userMenu" class="hidden relative">
+          <button id="userMenuBtn" class="flex items-center space-x-1 focus:outline-none">
+            <img id="userAvatar" src="https://picsum.photos/200/200?random=1" alt="用户头像" class="w-8 h-8 rounded-full object-cover">
+            <span id="userName" class="text-gray-700">用户名</span>
+            <i class="fa fa-caret-down text-gray-500"></i>
+          </button>
+          <div id="userDropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 hidden">
+            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">个人资料</a>
+            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">设置</a>
+            <hr class="my-1">
+            <button id="logoutBtn" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50">退出登录</button>
+          </div>
+        </div>
+      </div>
+      <button class="md:hidden text-gray-600">
+        <i class="fa fa-bars text-xl"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- 主要内容区 -->
+  <main class="flex-grow flex flex-col items-center justify-center px-4 md:px-8 py-8">
+    <div class="max-w-4xl w-full mx-auto">
+      <!-- 搜索区域 - 会向上滑动 -->
+      <div id="searchContainer" class="search-container w-full">
+        <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-dark text-center mb-8">
+          智能分析查询平台
+        </h2>
+        
+        <div class="flex flex-col md:flex-row gap-4 items-center">
+          <div class="relative flex-grow">
+            <input 
+              type="text" 
+              id="searchInput" 
+              placeholder="输入查询内容..." 
+              class="w-full px-5 py-4 rounded-lg border border-gray-200 shadow-sm focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none text-gray-700 text-lg"
+            >
+          </div>
+          
+          <!-- 功能选择下拉列表 -->
+          <div class="relative w-full md:w-48">
+            <select 
+              id="functionSelect" 
+              class="w-full appearance-none px-5 py-4 rounded-lg border border-gray-200 shadow-sm focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none text-gray-700 bg-white text-lg"
+            >
+              <option value="comprehensive">综合分析</option>
+              <option value="fundamental">基本面分析</option>
+              <option value="companies">涉及公司查询</option>
+              <option value="trend">趋势预测</option>
+              <option value="comparison">对比分析</option>
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+              <i class="fa fa-chevron-down text-sm"></i>
+            </div>
+          </div>
+          
+          <!-- 提交按钮 -->
+          <button 
+            id="submitBtn" 
+            class="w-full md:w-auto bg-primary hover:bg-primary/90 text-white font-medium px-6 py-4 rounded-lg transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+          >
+            <i class="fa fa-search mr-2"></i>查询
+          </button>
+        </div>
+        
+        <div class="mt-6 flex flex-wrap gap-3 justify-center">
+          <span class="text-gray-500 text-sm">热门查询:</span>
+          <a href="#" class="text-gray-600 text-sm hover:text-primary transition-colors">市场动态</a>
+          <a href="#" class="text-gray-600 text-sm hover:text-primary transition-colors">行业报告</a>
+          <a href="#" class="text-gray-600 text-sm hover:text-primary transition-colors">财务指标</a>
+          <a href="#" class="text-gray-600 text-sm hover:text-primary transition-colors">上市公司</a>
+        </div>
+      </div>
+      
+      <!-- 结果展示区域 -->
+      <div id="resultContainer" class="result-container w-full">
+        <!-- 加载状态 -->
+        <div id="loadingState" class="hidden">
+          <div class="bg-white rounded-xl shadow-md p-8 flex flex-col items-center justify-center">
+            <div class="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin mb-4"></div>
+            <p class="text-gray-600 pulse-animation">正在分析数据，请稍候...</p>
+          </div>
+        </div>
+        
+        <!-- 错误状态 -->
+        <div id="errorState" class="hidden">
+          <div class="bg-red-50 rounded-xl shadow-md p-8">
+            <div class="flex items-center">
+              <i class="fa fa-exclamation-triangle text-red-500 text-2xl mr-4"></i>
+              <div>
+                <h3 class="text-xl font-bold text-red-700">发生错误</h3>
+                <p id="errorMessage" class="text-red-600 mt-2">搜索过程中发生未知错误</p>
+              </div>
+            </div>
+            <div class="mt-6 flex justify-end">
+              <button id="retryBtn" class="bg-primary hover:bg-primary/90 text-white font-medium px-4 py-2 rounded-lg transition-colors">
+                重试
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 权限不足状态 -->
+        <div id="permissionDeniedState" class="hidden">
+          <div class="bg-yellow-50 rounded-xl shadow-md p-8">
+            <div class="flex items-center">
+              <i class="fa fa-lock text-yellow-500 text-2xl mr-4"></i>
+              <div>
+                <h3 class="text-xl font-bold text-yellow-700">权限不足</h3>
+                <p id="permissionMessage" class="text-yellow-600 mt-2">您需要更高级别的权限才能使用此功能</p>
+              </div>
+            </div>
+            <div class="mt-6 flex justify-end">
+              <button id="upgradeBtn" class="bg-yellow-500 hover:bg-yellow-600 text-white font-medium px-4 py-2 rounded-lg transition-colors">
+                升级权限
+              </button>
+              <button id="loginRedirectBtn" class="ml-2 bg-primary hover:bg-primary/90 text-white font-medium px-4 py-2 rounded-lg transition-colors">
+                去登录
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 结果内容 -->
+        <div id="resultContent" class="hidden">
+          <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="p-6 border-b border-gray-100">
+              <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-dark">
+                  <span id="resultTitle">分析结果</span>
+                </h3>
+                <span id="resultTypeBadge" class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium">
+                  综合分析
+                </span>
+              </div>
+              <p class="text-gray-500 text-sm">
+                查询内容: <span id="resultQuery" class="text-gray-700 font-medium">人工智能行业发展</span>
+                <span class="mx-2">•</span>
+                更新时间: <span id="resultTime" class="text-gray-700 font-medium">2023-06-15 14:30</span>
+              </p>
+            </div>
+            
+            <div class="p-6">
+              <div id="resultBody" class="prose max-w-none text-gray-700 whitespace-pre-wrap overflow-y-auto">
+                人工智能行业近年来呈现快速发展态势，市场规模持续扩大。根据最新数据，全球人工智能市场规模在2023年预计达到1,500亿美元，年增长率超过30%。
+
+主要发展趋势：
+1. 生成式AI技术持续突破，应用场景不断丰富
+2. AI与各行业深度融合，数字化转型加速
+3. 大模型技术不断迭代，性能持续提升
+4. AI伦理与监管逐渐完善
+
+重点企业：
+- 科技巨头A：AI研发投入占比达25%
+- 创新企业B：专注生成式AI应用
+- 数据服务C：提供AI训练数据支持
+              </div>
+              
+              <div class="mt-6 flex justify-end">
+                <button class="text-primary hover:text-primary/80 font-medium flex items-center transition-colors">
+                  查看完整报告 <i class="fa fa-arrow-right ml-2"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 相关推荐 -->
+          <div class="mt-6">
+            <h3 class="text-lg font-bold text-dark mb-4">相关查询</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <a href="#" class="bg-white rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow border border-gray-100">
+                <p class="font-medium text-gray-800">人工智能行业政策分析</p>
+                <p class="text-sm text-gray-500 mt-1">政策动态 • 影响评估</p>
+              </a>
+              <a href="#" class="bg-white rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow border border-gray-100">
+                <p class="font-medium text-gray-800">AI技术专利分布研究</p>
+                <p class="text-sm text-gray-500 mt-1">技术分析 • 企业布局</p>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="w-full py-6 px-4 md:px-8 border-t border-gray-200">
+    <div class="max-w-6xl mx-auto text-center text-gray-500 text-sm">
+      <p>© 2023 分析查询系统 版权所有</p>
+      <div class="flex justify-center space-x-6 mt-3">
+        <a href="#" class="hover:text-primary transition-colors">使用条款</a>
+        <a href="#" class="hover:text-primary transition-colors">隐私政策</a>
+        <a href="#" class="hover:text-primary transition-colors">联系我们</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // 检查用户登录状态
+    async function checkUserStatus() {
+      try {
+        const response = await fetch('/api/user/profile');
+        const data = await response.json();
+        
+        if (data.success) {
+          // 用户已登录
+          document.getElementById('loginLink').classList.add('hidden');
+          document.getElementById('userMenu').classList.remove('hidden');
+          document.getElementById('userName').textContent = data.user.username;
+        } else {
+          // 用户未登录
+          document.getElementById('loginLink').classList.remove('hidden');
+          document.getElementById('userMenu').classList.add('hidden');
+        }
+      } catch (error) {
+        console.error('检查用户状态失败:', error);
+        // 出错时默认显示未登录状态
+        document.getElementById('loginLink').classList.remove('hidden');
+        document.getElementById('userMenu').classList.add('hidden');
+      }
+    }
+    
+    // 页面加载完成后初始化
+    document.addEventListener('DOMContentLoaded', async function() {
+      // 检查用户状态
+      await checkUserStatus();
+      
+      // 初始化页面功能
+      initializePage();
+    });
+    
+    // 初始化页面功能
+    function initializePage() {
+      // 获取DOM元素
+      const searchContainer = document.getElementById('searchContainer');
+      const resultContainer = document.getElementById('resultContainer');
+      const submitBtn = document.getElementById('submitBtn');
+      const searchInput = document.getElementById('searchInput');
+      const functionSelect = document.getElementById('functionSelect');
+      const loadingState = document.getElementById('loadingState');
+      const errorState = document.getElementById('errorState');
+      const resultContent = document.getElementById('resultContent');
+      const resultTitle = document.getElementById('resultTitle');
+      const resultTypeBadge = document.getElementById('resultTypeBadge');
+      const resultQuery = document.getElementById('resultQuery');
+      const resultTime = document.getElementById('resultTime');
+      const resultBody = document.getElementById('resultBody');
+      const errorMessage = document.getElementById('errorMessage');
+      const retryBtn = document.getElementById('retryBtn');
+      const loginLink = document.getElementById('loginLink');
+      const logoutBtn = document.getElementById('logoutBtn');
+      const userMenuBtn = document.getElementById('userMenuBtn');
+      const userDropdown = document.getElementById('userDropdown');
+      
+      // 提交按钮点击事件
+      submitBtn.addEventListener('click', performSearch);
+      
+      // 回车键触发搜索
+      searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          performSearch();
+        }
+      });
+      
+      // 重试按钮点击事件
+      retryBtn.addEventListener('click', performSearch);
+      
+      
+      // 登录链接点击事件
+      loginLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        alert('请返回首页登录');
+        window.location.href = '/';
+      });
+      
+      // 登出按钮点击事件
+      logoutBtn.addEventListener('click', async function() {
+        try {
+          const response = await fetch('/api/logout', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            }
+          });
+          
+          const data = await response.json();
+          
+          if (data.success) {
+            // 重新加载页面以更新状态
+            location.reload();
+          } else {
+            alert(data.message || '登出失败');
+          }
+        } catch (error) {
+          console.error('登出失败:', error);
+          alert('登出失败，请重试');
+        }
+      });
+      
+      // 用户菜单按钮点击事件
+      userMenuBtn.addEventListener('click', function() {
+        userDropdown.classList.toggle('hidden');
+      });
+      
+      // 点击页面其他区域关闭用户菜单
+      document.addEventListener('click', function(event) {
+        if (!userMenuBtn.contains(event.target) && !userDropdown.contains(event.target)) {
+          userDropdown.classList.add('hidden');
+        }
+      });
+      
+      // 执行搜索功能
+      async function performSearch() {
+        const query = searchInput.value.trim();
+        const selectedFunction = functionSelect.value;
+        const functionText = functionSelect.options[functionSelect.selectedIndex].text;
+        
+        // 验证输入
+        if (!query) {
+          alert('请输入查询内容');
+          searchInput.focus();
+          return;
+        }
+        
+        // 更新结果信息
+        resultQuery.textContent = query;
+        resultTypeBadge.textContent = functionText;
+        
+        // 设置当前时间
+        const now = new Date();
+        const timeStr = `${now.getFullYear()}-${(now.getMonth()+1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+        resultTime.textContent = timeStr;
+        
+        // 显示加载状态
+        hideAllStates();
+        loadingState.classList.remove('hidden');
+        
+        // 搜索框向上滑动，显示结果区域
+        searchContainer.classList.add('active');
+        resultContainer.classList.add('active');
+        
+        // 调用后端API
+        try {
+          const response = await fetch('/api/stock-analysis/search', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              query: query,
+              functionType: selectedFunction
+            })
+          });
+          
+          const data = await response.json();
+          
+          if (data.success) {
+            // 显示结果
+            displayResult(data.data);
+          } else {
+            // 显示错误
+            displayError(data.error);
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          displayError('网络错误，请检查您的网络连接');
+        }
+      }
+      
+      // 显示搜索结果
+      function displayResult(data) {
+        // 更新标题
+        resultTitle.textContent = data.functionName + '结果';
+        
+        // 更新查询内容和时间
+        resultQuery.textContent = data.query;
+        
+        const now = new Date();
+        const timeStr = `${now.getFullYear()}-${(now.getMonth()+1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+        resultTime.textContent = timeStr;
+        
+        // 更新结果内容
+        resultBody.textContent = data.result;
+        
+        // 隐藏加载状态，显示结果
+        hideAllStates();
+        resultContent.classList.remove('hidden');
+
+        // 设置内容高度自适应
+        resultBody.style.height = 'auto';
+        resultBody.style.height = (resultBody.scrollHeight + 10) + 'px'; // 添加一点额外空间
+        
+        // 滚动到结果区域
+        resultContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      
+      // 显示错误信息
+      function displayError(errorMsg) {
+        errorMessage.textContent = errorMsg;
+        
+        // 隐藏加载状态，显示错误
+        hideAllStates();
+        errorState.classList.remove('hidden');
+        
+        // 滚动到结果区域
+        resultContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      
+      // 隐藏所有状态
+      function hideAllStates() {
+        loadingState.classList.add('hidden');
+        errorState.classList.add('hidden');
+        resultContent.classList.add('hidden');
+      }
+    }
+  </script>
+</body>
+</html>

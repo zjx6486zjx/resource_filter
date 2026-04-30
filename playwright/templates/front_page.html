@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>金融服务平台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#7B61FF',
+                        accent: '#00C48C',
+                        neutral: '#1D2129',
+                        'neutral-light': '#4E5969',
+                        'neutral-lighter': '#C9CDD4',
+                        'neutral-lightest': '#F2F3F5'
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .card-hover {
+                @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
+            }
+            .btn-primary {
+                @apply bg-primary text-white px-4 py-2 rounded-lg transition-all duration-300 hover:bg-primary/90 focus:ring-2 focus:ring-primary/50 focus:outline-none;
+            }
+            .btn-secondary {
+                @apply bg-white text-primary border border-primary px-4 py-2 rounded-lg transition-all duration-300 hover:bg-primary/5 focus:ring-2 focus:ring-primary/50 focus:outline-none;
+            }
+        }
+    </style>
+</head>
+<body class="font-inter bg-neutral-lightest min-h-screen flex flex-col">
+    <!-- 导航栏 -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <i class="fa fa-line-chart text-primary text-2xl"></i>
+                <h1 class="text-xl font-bold text-neutral">金融服务平台</h1>
+            </div>
+            <div class="hidden md:flex items-center space-x-4">
+                <a href="#" class="text-neutral-light hover:text-primary transition-colors">首页</a>
+                <a href="#" class="text-neutral-light hover:text-primary transition-colors">市场</a>
+                <a href="#" class="text-neutral-light hover:text-primary transition-colors">工具</a>
+                <a href="#" class="text-neutral-light hover:text-primary transition-colors">社区</a>
+            </div>
+            <div class="flex items-center space-x-3">
+                <button id="loginBtn" class="btn-secondary">登录</button>
+                <button id="registerBtn" class="btn-primary">注册</button>
+                <div class="relative">
+                    <button id="userMenuBtn" class="hidden items-center space-x-1">
+                        <img src="https://picsum.photos/200/200?random=1" alt="用户头像" class="w-8 h-8 rounded-full object-cover">
+                        <span class="text-neutral">用户名</span>
+                        <i class="fa fa-caret-down text-neutral-light"></i>
+                    </button>
+                    
+                    <!-- 用户下拉菜单 -->
+                    <div id="userDropdown" class="hidden absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                            <i class="fa fa-user mr-2"></i>个人资料
+                        </a>
+                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                            <i class="fa fa-cog mr-2"></i>设置
+                        </a>
+                        <hr class="my-1">
+                        <button id="logoutBtn" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors">
+                            <i class="fa fa-sign-out mr-2"></i>退出登录
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <button class="md:hidden text-neutral-light" id="mobileMenuBtn">
+                <i class="fa fa-bars text-xl"></i>
+            </button>
+        </div>
+        <!-- 移动端菜单 -->
+        <div id="mobileMenu" class="md:hidden hidden bg-white border-t">
+            <div class="container mx-auto px-4 py-2 flex flex-col space-y-3">
+                <a href="#" class="text-neutral-light hover:text-primary transition-colors py-2">首页</a>
+                <a href="#" class="text-neutral-light hover:text-primary transition-colors py-2">市场</a>
+                <a href="#" class="text-neutral-light hover:text-primary transition-colors py-2">工具</a>
+                <a href="#" class="text-neutral-light hover:text-primary transition-colors py-2">社区</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="flex-grow container mx-auto px-4 py-8">
+        <section class="mb-12">
+            <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-neutral mb-6">探索我们的服务</h2>
+            <p class="text-neutral-light mb-8 max-w-2xl">我们提供多种金融工具和服务，帮助你做出更明智的投资决策，管理个人财务，以及探索更多投资机会。</p>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- 资讯获取卡片 -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover cursor-pointer" data-url="/get_stock_analysis_result">
+                    <div class="h-48 bg-primary/10 relative overflow-hidden">
+                        <img src="https://picsum.photos/400/300?random=10" alt="财经资讯" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                        <div class="absolute bottom-4 left-4 text-white">
+                            <i class="fa fa-newspaper-o text-xl mb-1"></i>
+                            <h3 class="text-lg font-semibold">资讯获取</h3>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <p class="text-neutral-light mb-4">获取全球最新财经资讯，掌握市场动态和投资机会。</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs text-neutral-lighter">实时更新</span>
+                            <i class="fa fa-arrow-right text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 股票分析卡片 -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover cursor-pointer" data-url="/stock-analysis">
+                    <div class="h-48 bg-secondary/10 relative overflow-hidden">
+                        <img src="https://picsum.photos/400/300?random=11" alt="股票分析" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                        <div class="absolute bottom-4 left-4 text-white">
+                            <i class="fa fa-bar-chart text-xl mb-1"></i>
+                            <h3 class="text-lg font-semibold">股票分析</h3>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <p class="text-neutral-light mb-4">深入分析股票数据，提供技术指标和基本面分析。</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs text-neutral-lighter">专业工具</span>
+                            <i class="fa fa-arrow-right text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 智能研报卡片 -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover cursor-pointer" data-url="/stock-analysis-reports">
+                    <div class="h-48 bg-purple-500/10 relative overflow-hidden">
+                        <img src="https://picsum.photos/400/300?random=99" alt="智能研报" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                        <div class="absolute bottom-4 left-4 text-white">
+                            <i class="fa fa-file-text text-xl mb-1"></i>
+                            <h3 class="text-lg font-semibold">智能研报</h3>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <p class="text-neutral-light mb-4">自动抓取聊天记录并生成深度市场情绪与龙头股报告。</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs text-neutral-lighter">自动生成</span>
+                            <i class="fa fa-arrow-right text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 股票推荐卡片 -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover cursor-pointer" data-url="http://localhost:8012/stock-recommendation">
+                    <div class="h-48 bg-accent/10 relative overflow-hidden">
+                        <img src="https://picsum.photos/400/300?random=12" alt="股票推荐" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                        <div class="absolute bottom-4 left-4 text-white">
+                            <i class="fa fa-star text-xl mb-1"></i>
+                            <h3 class="text-lg font-semibold">股票推荐</h3>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <p class="text-neutral-light mb-4">基于AI算法的股票推荐，发现潜在投资机会。</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs text-neutral-lighter">AI驱动</span>
+                            <i class="fa fa-arrow-right text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 小红书文案生成器卡片 -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover cursor-pointer" data-url="http://localhost:8012/xiaohongshu-generator">
+                    <div class="h-48 bg-primary/10 relative overflow-hidden">
+                        <img src="https://picsum.photos/400/300?random=13" alt="文案生成器" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                        <div class="absolute bottom-4 left-4 text-white">
+                            <i class="fa fa-pencil text-xl mb-1"></i>
+                            <h3 class="text-lg font-semibold">小红书文案生成器</h3>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <p class="text-neutral-light mb-4">自动生成吸引人的小红书金融投资类文案。</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs text-neutral-lighter">内容创作</span>
+                            <i class="fa fa-arrow-right text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 小红书相似内容查找卡片 -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover cursor-pointer" data-url="http://localhost:8012/xhs_search">
+                    <div class="h-48 bg-accent/10 relative overflow-hidden">
+                        <img src="https://picsum.photos/400/300?random=16" alt="相似内容查找" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                        <div class="absolute bottom-4 left-4 text-white">
+                            <i class="fa fa-search text-xl mb-1"></i>
+                            <h3 class="text-lg font-semibold">小红书相似内容查找</h3>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <p class="text-neutral-light mb-4">基于向量搜索技术，快速找到相似的小红书内容。</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs text-neutral-lighter">智能搜索</span>
+                            <i class="fa fa-arrow-right text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 潜在博主筛选卡片 -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover cursor-pointer" data-url="/blogger-filter">
+                    <div class="h-48 bg-pink-500/10 relative overflow-hidden">
+                        <img src="https://picsum.photos/400/300?random=17" alt="潜在博主筛选" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                        <div class="absolute bottom-4 left-4 text-white">
+                            <i class="fa fa-filter text-xl mb-1"></i>
+                            <h3 class="text-lg font-semibold">潜在博主筛选</h3>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <p class="text-neutral-light mb-4">查看并发掘到的博主，进行二次筛选。</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs text-neutral-lighter">数据筛选</span>
+                            <i class="fa fa-arrow-right text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 虚拟人物卡片 -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover cursor-pointer" data-url="http://localhost:8012/virtual-character">
+                    <div class="h-48 bg-secondary/10 relative overflow-hidden">
+                        <img src="https://picsum.photos/400/300?random=14" alt="虚拟人物" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                        <div class="absolute bottom-4 left-4 text-white">
+                            <i class="fa fa-user-o text-xl mb-1"></i>
+                            <h3 class="text-lg font-semibold">虚拟人物</h3>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <p class="text-neutral-light mb-4">与AI金融顾问对话，获取个性化投资建议。</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs text-neutral-lighter">智能助手</span>
+                            <i class="fa fa-arrow-right text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 摸鱼小游戏卡片 -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover cursor-pointer" data-url="http://localhost:8012/games">
+                    <div class="h-48 bg-accent/10 relative overflow-hidden">
+                        <img src="https://picsum.photos/400/300?random=15" alt="摸鱼小游戏" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                        <div class="absolute bottom-4 left-4 text-white">
+                            <i class="fa fa-gamepad text-xl mb-1"></i>
+                            <h3 class="text-lg font-semibold">摸鱼小游戏</h3>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <p class="text-neutral-light mb-4">工作间隙放松一下，玩点与金融相关的小游戏。</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs text-neutral-lighter">休闲娱乐</span>
+                            <i class="fa fa-arrow-right text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-neutral text-white py-10">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <i class="fa fa-line-chart text-primary text-2xl"></i>
+                        <h3 class="text-xl font-bold">金融服务平台</h3>
+                    </div>
+                    <p class="text-gray-400 mb-4">提供专业的金融工具和服务，助力你的投资之旅。</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fa fa-weibo"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fa fa-wechat"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fa fa-twitter"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fa fa-linkedin"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">服务</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">资讯获取</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">股票分析</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">股票推荐</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">小红书文案生成器</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">小红书相似内容查找</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">虚拟人物</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">摸鱼小游戏</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">关于我们</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">公司简介</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">团队介绍</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">加入我们</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">联系方式</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">帮助中心</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">常见问题</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">使用教程</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">隐私政策</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">服务条款</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400 text-sm">
+                <p>© 2025 金融服务平台 版权所有</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 登录模态框 -->
+    <div id="loginModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 transform transition-all duration-300 scale-95 opacity-0" id="loginModalContent">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold text-neutral">登录</h3>
+                    <button id="closeLoginModal" class="text-neutral-light hover:text-neutral">
+                        <i class="fa fa-times"></i>
+                    </button>
+                </div>
+                
+                <form id="loginForm">
+                    <div class="mb-4">
+                        <label for="loginEmail" class="block text-neutral-light mb-2">用户名/邮箱</label>
+                        <input type="text" id="loginEmail" class="w-full px-4 py-2 border border-neutral-lighter rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all" placeholder="请输入用户名或邮箱">
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label for="loginPassword" class="block text-neutral-light mb-2">密码</label>
+                        <input type="password" id="loginPassword" class="w-full px-4 py-2 border border-neutral-lighter rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all" placeholder="请输入密码">
+                    </div>
+                    
+                    <div class="flex justify-between items-center mb-6">
+                        <label class="flex items-center space-x-2">
+                            <input type="checkbox" class="rounded text-primary focus:ring-primary">
+                            <span class="text-sm text-neutral-light">记住我</span>
+                        </label>
+                        <a href="#" class="text-sm text-primary hover:underline">忘记密码？</a>
+                    </div>
+                    
+                    <button type="submit" class="w-full btn-primary py-3">登录</button>
+                </form>
+                
+                <div class="mt-6 text-center">
+                    <p class="text-neutral-light">还没有账号？ <button id="switchToRegister" class="text-primary hover:underline">立即注册</button></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 注册模态框 -->
+    <div id="registerModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 transform transition-all duration-300 scale-95 opacity-0" id="registerModalContent">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold text-neutral">注册</h3>
+                    <button id="closeRegisterModal" class="text-neutral-light hover:text-neutral">
+                        <i class="fa fa-times"></i>
+                    </button>
+                </div>
+                
+                <form id="registerForm">
+                    <div class="mb-4">
+                        <label for="registerName" class="block text-neutral-light mb-2">用户名</label>
+                        <input type="text" id="registerName" class="w-full px-4 py-2 border border-neutral-lighter rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all" placeholder="请输入用户名">
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="registerEmail" class="block text-neutral-light mb-2">邮箱</label>
+                        <input type="email" id="registerEmail" class="w-full px-4 py-2 border border-neutral-lighter rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all" placeholder="请输入邮箱">
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="registerPassword" class="block text-neutral-light mb-2">密码</label>
+                        <input type="password" id="registerPassword" class="w-full px-4 py-2 border border-neutral-lighter rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all" placeholder="请输入密码">
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label for="registerConfirmPassword" class="block text-neutral-light mb-2">确认密码</label>
+                        <input type="password" id="registerConfirmPassword" class="w-full px-4 py-2 border border-neutral-lighter rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all" placeholder="请再次输入密码">
+                    </div>
+                    
+                    <div class="flex items-center space-x-2 mb-6">
+                        <input type="checkbox" id="agreement" class="rounded text-primary focus:ring-primary">
+                        <label for="agreement" class="text-sm text-neutral-light">我已阅读并同意 <a href="#" class="text-primary hover:underline">服务条款</a> 和 <a href="#" class="text-primary hover:underline">隐私政策</a></label>
+                    </div>
+                    
+                    <button type="submit" class="w-full btn-primary py-3">注册</button>
+                </form>
+                
+                <div class="mt-6 text-center">
+                    <p class="text-neutral-light">已有账号？ <button id="switchToLogin" class="text-primary hover:underline">立即登录</button></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 检查用户登录状态
+        async function checkUserStatus() {
+            try {
+                const response = await fetch('/api/user/profile');
+                const data = await response.json();
+                
+                if (data.success) {
+                    // 用户已登录，显示用户菜单
+                    document.getElementById('loginBtn').classList.add('hidden');
+                    document.getElementById('registerBtn').classList.add('hidden');
+                    const userMenuBtn = document.getElementById('userMenuBtn');
+                    userMenuBtn.classList.remove('hidden');
+                    userMenuBtn.classList.add('flex');
+                    userMenuBtn.querySelector('span').textContent = data.user.username;
+                } else {
+                    // 用户未登录，显示登录/注册按钮
+                    document.getElementById('loginBtn').classList.remove('hidden');
+                    document.getElementById('registerBtn').classList.remove('hidden');
+                    document.getElementById('userMenuBtn').classList.add('hidden');
+                    document.getElementById('userMenuBtn').classList.remove('flex');
+                }
+            } catch (error) {
+                console.error('检查用户状态失败:', error);
+            }
+        }
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 检查用户状态
+            checkUserStatus();
+            
+            // 初始化其他功能
+            initializePage();
+        });
+        
+        // 初始化页面功能
+        function initializePage() {
+            // 登录注册模态框控制
+            const loginBtn = document.getElementById('loginBtn');
+            const registerBtn = document.getElementById('registerBtn');
+            const userMenuBtn = document.getElementById('userMenuBtn');
+            const loginModal = document.getElementById('loginModal');
+            const registerModal = document.getElementById('registerModal');
+            const loginModalContent = document.getElementById('loginModalContent');
+            const registerModalContent = document.getElementById('registerModalContent');
+            const closeLoginModal = document.getElementById('closeLoginModal');
+            const closeRegisterModal = document.getElementById('closeRegisterModal');
+            const switchToRegister = document.getElementById('switchToRegister');
+            const switchToLogin = document.getElementById('switchToLogin');
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const userDropdown = document.getElementById('userDropdown');
+            const logoutBtn = document.getElementById('logoutBtn');
+            
+            // 打开登录模态框
+            loginBtn.addEventListener('click', () => {
+                loginModal.classList.remove('hidden');
+                setTimeout(() => {
+                    loginModalContent.classList.remove('scale-95', 'opacity-0');
+                    loginModalContent.classList.add('scale-100', 'opacity-100');
+                }, 10);
+            });
+            
+            // 打开注册模态框
+            registerBtn.addEventListener('click', () => {
+                registerModal.classList.remove('hidden');
+                setTimeout(() => {
+                    registerModalContent.classList.remove('scale-95', 'opacity-0');
+                    registerModalContent.classList.add('scale-100', 'opacity-100');
+                }, 10);
+            });
+            
+            // 关闭登录模态框
+            function closeLogin() {
+                loginModalContent.classList.remove('scale-100', 'opacity-100');
+                loginModalContent.classList.add('scale-95', 'opacity-0');
+                setTimeout(() => {
+                    loginModal.classList.add('hidden');
+                }, 300);
+            }
+            
+            // 关闭注册模态框
+            function closeRegister() {
+                registerModalContent.classList.remove('scale-100', 'opacity-100');
+                registerModalContent.classList.add('scale-95', 'opacity-0');
+                setTimeout(() => {
+                    registerModal.classList.add('hidden');
+                }, 300);
+            }
+            
+            closeLoginModal.addEventListener('click', closeLogin);
+            closeRegisterModal.addEventListener('click', closeRegister);
+            
+            // 点击模态框外部关闭
+            loginModal.addEventListener('click', (e) => {
+                if (e.target === loginModal) closeLogin();
+            });
+            
+            registerModal.addEventListener('click', (e) => {
+                if (e.target === registerModal) closeRegister();
+            });
+            
+            // 切换到注册
+            switchToRegister.addEventListener('click', () => {
+                closeLogin();
+                setTimeout(() => {
+                    registerModal.classList.remove('hidden');
+                    setTimeout(() => {
+                        registerModalContent.classList.remove('scale-95', 'opacity-0');
+                        registerModalContent.classList.add('scale-100', 'opacity-100');
+                    }, 10);
+                }, 300);
+            });
+            
+            // 切换到登录
+            switchToLogin.addEventListener('click', () => {
+                closeRegister();
+                setTimeout(() => {
+                    loginModal.classList.remove('hidden');
+                    setTimeout(() => {
+                        loginModalContent.classList.remove('scale-95', 'opacity-0');
+                        loginModalContent.classList.add('scale-100', 'opacity-100');
+                    }, 10);
+                }, 300);
+            });
+            
+            // 登录表单提交
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
+                
+                if (!email || !password) {
+                    alert('请输入用户名/邮箱和密码！');
+                    return;
+                }
+                
+                try {
+                    const response = await fetch('/api/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            username: email, // 使用邮箱作为用户名登录
+                            password: password
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        alert(data.message);
+                        closeLogin();
+                        
+                        // 更新用户菜单显示
+                        loginBtn.classList.add('hidden');
+                        registerBtn.classList.add('hidden');
+                        userMenuBtn.classList.remove('hidden');
+                        userMenuBtn.classList.add('flex');
+                        userMenuBtn.querySelector('span').textContent = data.user.username;
+                    } else {
+                        alert(data.message);
+                    }
+                } catch (error) {
+                    alert('登录失败，请稍后重试');
+                    console.error('Login error:', error);
+                }
+            });
+            
+            // 注册表单提交
+            registerForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const name = document.getElementById('registerName').value;
+                const email = document.getElementById('registerEmail').value;
+                const password = document.getElementById('registerPassword').value;
+                const confirmPassword = document.getElementById('registerConfirmPassword').value;
+                const agreement = document.getElementById('agreement').checked;
+                
+                // 客户端验证
+                if (!name || !email || !password) {
+                    alert('请填写所有必填字段！');
+                    return;
+                }
+                
+                if (password !== confirmPassword) {
+                    alert('两次输入的密码不一致！');
+                    return;
+                }
+                
+                if (!agreement) {
+                    alert('请同意服务条款和隐私政策！');
+                    return;
+                }
+                
+                try {
+                    const response = await fetch('/api/register', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            username: name,
+                            email: email,
+                            password: password
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        alert(data.message);
+                        closeRegister();
+                        setTimeout(() => {
+                            loginModal.classList.remove('hidden');
+                            setTimeout(() => {
+                                loginModalContent.classList.remove('scale-95', 'opacity-0');
+                                loginModalContent.classList.add('scale-100', 'opacity-100');
+                            }, 10);
+                        }, 300);
+                    } else {
+                        alert(data.message);
+                    }
+                } catch (error) {
+                    alert('注册失败，请稍后重试');
+                    console.error('Register error:', error);
+                }
+            });
+            
+            // 移动端菜单控制
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+            
+            // 用户名实时验证
+            const registerNameInput = document.getElementById('registerName');
+            const registerEmailInput = document.getElementById('registerEmail');
+            let usernameCheckTimeout;
+            let emailCheckTimeout;
+            
+            // 用户名实时验证
+            registerNameInput.addEventListener('input', () => {
+                clearTimeout(usernameCheckTimeout);
+                const username = registerNameInput.value.trim();
+                
+                if (username.length >= 3) {
+                    usernameCheckTimeout = setTimeout(async () => {
+                        try {
+                            const response = await fetch('/api/check_username', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({ username: username })
+                            });
+                            
+                            const data = await response.json();
+                            
+                            // 移除之前的提示
+                            const existingHint = registerNameInput.parentNode.querySelector('.username-hint');
+                            if (existingHint) {
+                                existingHint.remove();
+                            }
+                            
+                            // 添加新的提示
+                            const hint = document.createElement('div');
+                            hint.className = 'username-hint text-xs mt-1';
+                            hint.textContent = data.message;
+                            
+                            if (data.available) {
+                                hint.classList.add('text-green-600');
+                                registerNameInput.classList.remove('border-red-300');
+                                registerNameInput.classList.add('border-green-300');
+                            } else {
+                                hint.classList.add('text-red-600');
+                                registerNameInput.classList.remove('border-green-300');
+                                registerNameInput.classList.add('border-red-300');
+                            }
+                            
+                            registerNameInput.parentNode.appendChild(hint);
+                        } catch (error) {
+                            console.error('Username check error:', error);
+                        }
+                    }, 500);
+                }
+            });
+            
+            // 邮箱实时验证
+            registerEmailInput.addEventListener('input', () => {
+                clearTimeout(emailCheckTimeout);
+                const email = registerEmailInput.value.trim();
+                
+                if (email.length > 0) {
+                    emailCheckTimeout = setTimeout(async () => {
+                        try {
+                            const response = await fetch('/api/check_email', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({ email: email })
+                            });
+                            
+                            const data = await response.json();
+                            
+                            // 移除之前的提示
+                            const existingHint = registerEmailInput.parentNode.querySelector('.email-hint');
+                            if (existingHint) {
+                                existingHint.remove();
+                            }
+                            
+                            // 添加新的提示
+                            const hint = document.createElement('div');
+                            hint.className = 'email-hint text-xs mt-1';
+                            hint.textContent = data.message;
+                            
+                            if (data.available) {
+                                hint.classList.add('text-green-600');
+                                registerEmailInput.classList.remove('border-red-300');
+                                registerEmailInput.classList.add('border-green-300');
+                            } else {
+                                hint.classList.add('text-red-600');
+                                registerEmailInput.classList.remove('border-green-300');
+                                registerEmailInput.classList.add('border-red-300');
+                            }
+                            
+                            registerEmailInput.parentNode.appendChild(hint);
+                        } catch (error) {
+                            console.error('Email check error:', error);
+                        }
+                    }, 500);
+                }
+            });
+            
+            // 卡片点击跳转 - 添加权限检查
+            document.querySelectorAll('.card-hover').forEach(card => {
+                card.addEventListener('click', async () => {
+                    const url = card.getAttribute('data-url');
+                    const serviceId = getServiceIdFromCard(card);
+                    
+                    if (url && serviceId) {
+                        // 检查用户权限
+                        const hasPermission = await checkServicePermission(serviceId);
+                        if (hasPermission) {
+                            // 股票分析和资讯获取页面在当前窗口打开，其他页面在新窗口打开
+                            if (serviceId === 'stock-analysis' || serviceId === 'news') {
+                                window.location.href = url;
+                            } else {
+                                window.open(url, '_blank');
+                            }
+                        }
+                    } else if (url) {
+                        // 如果没有服务ID，直接跳转（向后兼容）
+                        window.location.href = url;
+                    }
+                });
+            });
+            
+            // 从卡片元素获取服务ID
+            function getServiceIdFromCard(card) {
+                const cardTitle = card.querySelector('h3');
+                if (!cardTitle) return null;
+                
+                const titleText = cardTitle.textContent.trim();
+                const serviceMap = {
+                    '资讯获取': 'news',
+                    '股票分析': 'stock-analysis', 
+                    '股票推荐': 'stock-recommendation',
+                    '小红书文案生成器': 'xiaohongshu-generator',
+                    '虚拟人物': 'virtual-character',
+                    '摸鱼小游戏': 'games'
+                };
+                
+                return serviceMap[titleText] || null;
+            }
+            
+            // 检查服务权限
+            async function checkServicePermission(serviceId) {
+                try {
+                    const response = await fetch('/api/check_service_permission', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ service_id: serviceId })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (!data.success) {
+                        alert(data.message);
+                        return false;
+                    }
+                    
+                    if (!data.has_permission) {
+                        showUpgradeModal(data.upgrade_info, data.message);
+                        return false;
+                    }
+                    
+                    return true;
+                } catch (error) {
+                    console.error('Permission check error:', error);
+                    alert('权限检查失败，请稍后重试');
+                    return false;
+                }
+            }
+            
+            // 显示升级权限模态框
+            function showUpgradeModal(upgradeInfo, message) {
+                const modal = document.createElement('div');
+                modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+                modal.innerHTML = `
+                    <div class="bg-white rounded-lg p-12 max-w-2xl mx-4 text-center">
+                        <h3 class="text-2xl font-semibold mb-8 text-gray-800">权限不足</h3>
+                        <p class="text-lg text-gray-600 mb-8">${message}</p>
+                        <div class="mb-8">
+                            <p class="text-base text-gray-500 mb-4">扫描二维码升级权限：</p>
+                            <img src="${upgradeInfo.qr_code}" alt="升级二维码" class="mx-auto w-64 h-64 border">
+                        </div>
+                        <div class="flex gap-6 justify-center">
+                            <button onclick="this.closest('.fixed').remove()" class="px-8 py-4 bg-gray-300 text-gray-700 rounded text-lg hover:bg-gray-400 transition-colors">
+                                取消
+                            </button>
+                            <button onclick="this.closest('.fixed').remove()" class="px-8 py-4 bg-blue-600 text-white rounded text-lg hover:bg-blue-700 transition-colors">
+                                我知道了
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.appendChild(modal);
+                
+                // 点击背景关闭模态框
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.remove();
+                    }
+                });
+            }
+            
+            // 用户菜单点击事件
+            userMenuBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                userDropdown.classList.toggle('hidden');
+            });
+            
+            // 点击页面其他地方关闭下拉菜单
+            document.addEventListener('click', (e) => {
+                if (!userMenuBtn.contains(e.target) && !userDropdown.contains(e.target)) {
+                    userDropdown.classList.add('hidden');
+                }
+            });
+            
+            // 退出登录功能
+            logoutBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                
+                try {
+                    const response = await fetch('/api/logout', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        // 隐藏用户菜单，显示登录注册按钮
+                        userMenuBtn.classList.add('hidden');
+                        userMenuBtn.classList.remove('flex');
+                        loginBtn.classList.remove('hidden');
+                        registerBtn.classList.remove('hidden');
+                        userDropdown.classList.add('hidden');
+                        
+                        alert(data.message);
+                        
+                        // 重新检查用户状态
+                        checkUserStatus();
+                    } else {
+                        alert(data.message || '退出登录失败');
+                    }
+                } catch (error) {
+                    console.error('Logout error:', error);
+                    alert('退出登录失败，请稍后重试');
+                }
+            });
+            
+            // 滚动时添加阴影效果
+            window.addEventListener('scroll', () => {
+                const header = document.querySelector('header');
+                if (window.scrollY > 10) {
+                    header.classList.add('shadow-md');
+                } else {
+                    header.classList.remove('shadow-md');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
+    

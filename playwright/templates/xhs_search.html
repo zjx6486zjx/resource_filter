@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小红书相似内容查找 - 发现相关笔记</title>
+    <!-- 引入Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    
+    <!-- 配置Tailwind自定义颜色和字体 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#fe2c55', // 抖音红色调作为主色
+                        secondary: '#1a1a1a',
+                        light: '#f7f7f7',
+                        dark: '#333333'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <!-- 自定义工具类 -->
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            }
+            .card-hover {
+                @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+            }
+            .animate-fade-in {
+                animation: fadeIn 0.5s ease-in-out;
+            }
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            .loading {
+                @apply animate-pulse;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans text-dark">
+    <!-- 顶部导航栏 -->
+    <header class="sticky top-0 z-50 bg-white shadow-sm transition-all duration-300">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <i class="fa fa-search text-primary text-2xl"></i>
+                <h1 class="text-xl font-bold bg-gradient-to-r from-primary to-pink-500 bg-clip-text text-transparent">相似内容查找</h1>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <a href="/" class="text-gray-600 hover:text-primary transition-colors">
+                    <i class="fa fa-home text-xl"></i>
+                </a>
+                <button class="md:hidden text-gray-700 hover:text-primary">
+                    <i class="fa fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="container mx-auto px-4 py-6">
+        <!-- 搜索区域 -->
+        <div class="max-w-2xl mx-auto mb-8">
+            <div class="bg-white rounded-2xl shadow-sm p-6">
+                <h2 class="text-2xl font-bold text-center mb-6 text-gray-900">搜索相似的小红书内容</h2>
+                <div class="flex flex-col space-y-4">
+                    <div class="relative">
+                        <input 
+                            type="text" 
+                            id="searchInput" 
+                            placeholder="输入你想搜索的内容关键词..." 
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 text-lg"
+                        >
+                        <i class="fa fa-search absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    </div>
+                    <button 
+                        id="searchBtn" 
+                        class="bg-gradient-to-r from-primary to-pink-500 text-white px-8 py-3 rounded-lg hover:from-primary/90 hover:to-pink-500/90 transition-all duration-200 font-semibold text-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+                    >
+                        <i class="fa fa-search mr-2"></i>
+                        开始搜索
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 加载状态 -->
+        <div id="loadingState" class="hidden text-center py-8">
+            <div class="inline-flex items-center space-x-2 text-primary">
+                <i class="fa fa-spinner fa-spin text-2xl"></i>
+                <span class="text-lg font-medium">正在搜索相似内容...</span>
+            </div>
+        </div>
+
+        <!-- 搜索结果区域 -->
+        <div id="resultsContainer" class="hidden">
+            <!-- Title相关结果 -->
+            <div class="mb-8">
+                <h3 class="text-xl font-bold mb-4 text-gray-900 flex items-center">
+                    <i class="fa fa-bookmark text-primary mr-2"></i>
+                    标题相关笔记
+                </h3>
+                <div id="titleResults" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- 动态生成的标题相关结果 -->
+                </div>
+            </div>
+
+            <!-- Keywords相关结果 -->
+            <div>
+                <h3 class="text-xl font-bold mb-4 text-gray-900 flex items-center">
+                    <i class="fa fa-tags text-primary mr-2"></i>
+                    关键词相关笔记
+                </h3>
+                <div id="keywordsResults" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- 动态生成的关键词相关结果 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 无结果状态 -->
+        <div id="noResults" class="hidden text-center py-12">
+            <i class="fa fa-search text-6xl text-gray-300 mb-4"></i>
+            <h3 class="text-xl font-semibold text-gray-600 mb-2">未找到相关内容</h3>
+            <p class="text-gray-500">尝试使用不同的关键词进行搜索</p>
+        </div>
+
+        <!-- 错误状态 -->
+        <div id="errorState" class="hidden text-center py-12">
+            <i class="fa fa-exclamation-triangle text-6xl text-red-400 mb-4"></i>
+            <h3 class="text-xl font-semibold text-red-600 mb-2">搜索出错</h3>
+            <p class="text-gray-500" id="errorMessage">请稍后重试</p>
+        </div>
+    </main>
+    
+    <!-- JavaScript -->
+    <script>
+        // DOM元素
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const loadingState = document.getElementById('loadingState');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const titleResults = document.getElementById('titleResults');
+        const keywordsResults = document.getElementById('keywordsResults');
+        const noResults = document.getElementById('noResults');
+        const errorState = document.getElementById('errorState');
+        const errorMessage = document.getElementById('errorMessage');
+
+        // 搜索功能
+        async function performSearch() {
+            const query = searchInput.value.trim();
+            if (!query) {
+                alert('请输入搜索关键词');
+                return;
+            }
+
+            // 显示加载状态
+            showLoadingState();
+
+            try {
+                const response = await fetch('/api/xhs_search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ query: query })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || '搜索失败');
+                }
+
+                // 显示搜索结果
+                displayResults(data);
+
+            } catch (error) {
+                console.error('搜索错误:', error);
+                showErrorState(error.message);
+            }
+        }
+
+        // 显示加载状态
+        function showLoadingState() {
+            hideAllStates();
+            loadingState.classList.remove('hidden');
+        }
+
+        // 显示搜索结果
+        function displayResults(data) {
+            hideAllStates();
+
+            const titleResultsData = data.title_results || [];
+            const keywordsResultsData = data.keywords_results || [];
+
+            if (titleResultsData.length === 0 && keywordsResultsData.length === 0) {
+                noResults.classList.remove('hidden');
+                return;
+            }
+
+            // 渲染标题相关结果
+            renderResults(titleResults, titleResultsData, 'title');
+
+            // 渲染关键词相关结果
+            renderResults(keywordsResults, keywordsResultsData, 'keywords');
+
+            resultsContainer.classList.remove('hidden');
+        }
+
+        // 渲染结果卡片
+        function renderResults(container, results, type) {
+            container.innerHTML = '';
+
+            results.forEach((result, index) => {
+                const card = createResultCard(result, type, index);
+                container.appendChild(card);
+            });
+        }
+
+        // 创建结果卡片
+        function createResultCard(result, type, index) {
+            const article = document.createElement('article');
+            article.className = 'bg-white rounded-2xl shadow-sm overflow-hidden card-hover animate-fade-in p-6';
+            article.style.animationDelay = `${index * 0.1}s`;
+
+            const similarity = (result.similarity * 100).toFixed(1);
+            const rerankScore = result.rerank_score ? (result.rerank_score * 100).toFixed(1) : null;
+            
+            let keywordsHtml = '';
+            if (type === 'keywords' && result.keywords) {
+                const keywordsText = typeof result.keywords === 'string' ? result.keywords : JSON.stringify(result.keywords);
+                keywordsHtml = `
+                    <div class="mb-3">
+                        <span class="text-sm font-medium text-gray-600">关键词:</span>
+                        <span class="text-sm text-primary ml-1">${keywordsText}</span>
+                    </div>
+                `;
+            }
+
+            // 获取完整内容，优先显示new_note
+            const fullContent = result.new_note || result.content || '暂无内容';
+            const isLongContent = fullContent.length > 300;
+            const shortContent = isLongContent ? fullContent.substring(0, 300) + '...' : fullContent;
+            const cardId = `card-${type}-${index}`;
+
+            article.innerHTML = `
+                <div>
+                    <div class="flex justify-between items-start mb-3">
+                        <h2 class="text-xl font-bold text-gray-900 flex-1">${result.title || '无标题'}</h2>
+                        <div class="ml-4 text-right">
+                            <div class="text-xs text-gray-500">相似度</div>
+                            <div class="text-sm font-semibold text-primary">${similarity}%</div>
+                            ${rerankScore ? `
+                                <div class="text-xs text-gray-500 mt-1">重排序</div>
+                                <div class="text-sm font-semibold text-green-600">${rerankScore}%</div>
+                            ` : ''}
+                        </div>
+                    </div>
+                    ${keywordsHtml}
+                    <div class="text-gray-700 leading-relaxed">
+                        <div id="${cardId}-short" class="${isLongContent ? '' : 'hidden'}">
+                            <p class="whitespace-pre-wrap">${shortContent}</p>
+                            <button onclick="toggleContent('${cardId}')" class="mt-2 text-primary hover:text-primary/80 text-sm font-medium">
+                                <i class="fa fa-chevron-down mr-1"></i>展开全文
+                            </button>
+                        </div>
+                        <div id="${cardId}-full" class="${isLongContent ? 'hidden' : ''}">
+                            <p class="whitespace-pre-wrap">${fullContent}</p>
+                            ${isLongContent ? `
+                                <button onclick="toggleContent('${cardId}')" class="mt-2 text-primary hover:text-primary/80 text-sm font-medium">
+                                    <i class="fa fa-chevron-up mr-1"></i>收起
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-gray-100">
+                        <div class="flex justify-between items-center text-xs text-gray-500">
+                            <span>${type === 'title' ? '标题匹配' : '关键词匹配'}</span>
+                            <span>来源: ${result.file_path ? result.file_path.split('/').pop() : '未知'}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            return article;
+        }
+
+        // 显示错误状态
+        function showErrorState(message) {
+            hideAllStates();
+            errorMessage.textContent = message;
+            errorState.classList.remove('hidden');
+        }
+
+        // 隐藏所有状态
+        function hideAllStates() {
+            loadingState.classList.add('hidden');
+            resultsContainer.classList.add('hidden');
+            noResults.classList.add('hidden');
+            errorState.classList.add('hidden');
+        }
+
+        // 事件监听
+        searchBtn.addEventListener('click', performSearch);
+        
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+
+        // 监听滚动，改变导航栏样式
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('header');
+            if (window.scrollY > 10) {
+                header.classList.add('shadow');
+                header.classList.remove('shadow-sm');
+            } else {
+                header.classList.remove('shadow');
+                header.classList.add('shadow-sm');
+            }
+        });
+
+        // 切换内容展开/收起
+        function toggleContent(cardId) {
+            const shortDiv = document.getElementById(`${cardId}-short`);
+            const fullDiv = document.getElementById(`${cardId}-full`);
+            
+            if (shortDiv.classList.contains('hidden')) {
+                // 当前显示完整内容，切换到简短内容
+                shortDiv.classList.remove('hidden');
+                fullDiv.classList.add('hidden');
+            } else {
+                // 当前显示简短内容，切换到完整内容
+                shortDiv.classList.add('hidden');
+                fullDiv.classList.remove('hidden');
+            }
+        }
+
+        // 页面加载完成后聚焦搜索框
+        document.addEventListener('DOMContentLoaded', function() {
+            searchInput.focus();
+        });
+    </script>
+</body>
+</html>

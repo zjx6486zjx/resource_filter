@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>多功能工具箱</title>
+
+    <!-- 资源预加载优化 -->
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+
+    <!-- 样式表 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+    <!-- Tailwind配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#7B61FF',
+                        success: '#00B42A',
+                        warning: '#FF7D00',
+                        danger: '#F53F3F',
+                        info: '#86909C',
+                        light: '#F2F3F5',
+                        dark: '#1D2129',
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'card': '0 10px 30px -5px rgba(0, 0, 0, 0.1)',
+                        'card-hover': '0 20px 40px -5px rgba(0, 0, 0, 0.15)',
+                    }
+                },
+            }
+        }
+    </script>
+
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .card-gradient {
+                background: linear-gradient(135deg, var(--tw-gradient-from) 0%, var(--tw-gradient-to) 100%);
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+            .transition-all-300 {
+                transition: all 0.3s ease;
+            }
+            .custom-font {
+                font-family: 'Open Sans', sans-serif;
+                line-height: 1.6;
+                letter-spacing: 0.02em;
+            }
+            
+            /* 加载骨架屏 */
+            .skeleton {
+                background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+                background-size: 200% 100%;
+                animation: loading 1.5s infinite;
+            }
+            
+            @keyframes loading {
+                0% { background-position: 200% 0; }
+                100% { background-position: -200% 0; }
+            }
+            
+            /* 移动端菜单优化 */
+            .mobile-menu {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+            
+            .mobile-menu.active {
+                transform: translateX(0);
+            }
+            
+            /* 模态框动画优化 */
+            .modal {
+                backdrop-filter: blur(4px);
+            }
+            
+            .modal-content {
+                animation: modalSlideIn 0.3s ease-out;
+            }
+            
+            @keyframes modalSlideIn {
+                from {
+                    opacity: 0;
+                    transform: scale(0.9) translateY(-20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: scale(1) translateY(0);
+                }
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 min-h-screen font-inter text-dark">
+    <!-- 页面头部 -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i class="fa fa-cogs text-primary text-2xl" aria-hidden="true"></i>
+                <h1 class="text-xl md:text-2xl font-bold text-primary">多功能工具箱</h1>
+            </div>
+
+            <!-- 桌面端导航 -->
+            <nav class="hidden md:flex items-center space-x-6" role="navigation" aria-label="主导航">
+                <a href="#"
+                    class="text-gray-600 hover:text-primary transition-all-300 focus:outline-none focus:ring-2 focus:ring-primary/50 rounded">
+                    <i class="fa fa-home mr-1" aria-hidden="true"></i>首页
+                </a>
+                <a href="#"
+                    class="text-gray-600 hover:text-primary transition-all-300 focus:outline-none focus:ring-2 focus:ring-primary/50 rounded">
+                    <i class="fa fa-question-circle mr-1" aria-hidden="true"></i>帮助
+                </a>
+                <a href="#"
+                    class="text-gray-600 hover:text-primary transition-all-300 focus:outline-none focus:ring-2 focus:ring-primary/50 rounded">
+                    <i class="fa fa-user mr-1" aria-hidden="true"></i>关于
+                </a>
+            </nav>
+
+            <!-- 移动端菜单按钮 -->
+            <button id="mobile-menu-toggle"
+                class="md:hidden text-gray-600 focus:outline-none focus:ring-2 focus:ring-primary/50 rounded"
+                aria-label="打开菜单">
+                <i class="fa fa-bars text-xl" aria-hidden="true"></i>
+            </button>
+        </div>
+
+        <!-- 移动端菜单 -->
+        <nav id="mobile-menu" class="mobile-menu md:hidden fixed inset-y-0 left-0 w-64 bg-white shadow-lg z-50"
+            role="navigation" aria-label="移动端导航">
+            <div class="p-4">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-lg font-bold text-primary">菜单</h2>
+                    <button id="mobile-menu-close"
+                        class="text-gray-600 focus:outline-none focus:ring-2 focus:ring-primary/50 rounded"
+                        aria-label="关闭菜单">
+                        <i class="fa fa-times text-xl" aria-hidden="true"></i>
+                    </button>
+                </div>
+                <div class="space-y-4">
+                    <a href="#"
+                        class="block text-gray-600 hover:text-primary transition-all-300 focus:outline-none focus:ring-2 focus:ring-primary/50 rounded p-2">
+                        <i class="fa fa-home mr-2" aria-hidden="true"></i>首页
+                    </a>
+                    <a href="#"
+                        class="block text-gray-600 hover:text-primary transition-all-300 focus:outline-none focus:ring-2 focus:ring-primary/50 rounded p-2">
+                        <i class="fa fa-question-circle mr-2" aria-hidden="true"></i>帮助
+                    </a>
+                    <a href="#"
+                        class="block text-gray-600 hover:text-primary transition-all-300 focus:outline-none focus:ring-2 focus:ring-primary/50 rounded p-2">
+                        <i class="fa fa-user mr-2" aria-hidden="true"></i>关于
+                    </a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="container mx-auto px-4 py-8" role="main">
+        <section class="mb-12">
+            <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-center mb-8 text-dark">强大功能，一键使用</h2>
+            <p class="text-center text-gray-600 max-w-2xl mx-auto mb-12">
+                我们提供了一系列实用工具，帮助您更高效地完成工作，节省宝贵时间。
+            </p>
+
+            <!-- 功能卡片网格 -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 md:gap-10" role="grid">
+                <!-- 小红书文案生成卡片 -->
+                <div class="function-card bg-white rounded-xl shadow-card hover:shadow-card-hover transform hover:-translate-y-1 transition-all-300 overflow-hidden cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    data-target="xhs-modal" role="gridcell" tabindex="0" aria-label="小红书文案生成工具">
+                    <div class="h-48 card-gradient from-primary/90 to-primary p-6 flex flex-col justify-between">
+                        <div class="flex justify-end">
+                            <i class="fa fa-comment text-white text-3xl opacity-80" aria-hidden="true"></i>
+                        </div>
+                        <h3 class="text-white text-xl font-bold text-shadow">小红书文案生成</h3>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-gray-600 mb-4">输入产品信息，自动生成吸引人的小红书推广文案。</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-primary font-medium">点击使用</span>
+                            <i class="fa fa-arrow-right text-primary" aria-hidden="true"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 公众号一键发布卡片 -->
+                <div class="function-card bg-white rounded-xl shadow-card hover:shadow-card-hover transform hover:-translate-y-1 transition-all-300 overflow-hidden cursor-pointer focus:outline-none focus:ring-2 focus:ring-secondary/50"
+                    data-target="gzh-action" role="gridcell" tabindex="0" aria-label="公众号一键发布工具">
+                    <div class="h-48 card-gradient from-secondary/90 to-secondary p-6 flex flex-col justify-between">
+                        <div class="flex justify-end">
+                            <i class="fa fa-weixin text-white text-3xl opacity-80" aria-hidden="true"></i>
+                        </div>
+                        <h3 class="text-white text-xl font-bold text-shadow">公众号一键发布</h3>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-gray-600 mb-4">一键发布内容到公众号，简化繁琐的发布流程。</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-secondary font-medium">点击使用</span>
+                            <i class="fa fa-arrow-right text-secondary" aria-hidden="true"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 股票分析卡片 -->
+                <div class="function-card bg-white rounded-xl shadow-card hover:shadow-card-hover transform hover:-translate-y-1 transition-all-300 overflow-hidden cursor-pointer focus:outline-none focus:ring-2 focus:ring-success/50"
+                    data-target="stock-analysis" role="gridcell" tabindex="0" aria-label="股票分析工具">
+                    <div class="h-48 card-gradient from-success/90 to-success p-6 flex flex-col justify-between">
+                        <div class="flex justify-end">
+                            <i class="fa fa-line-chart text-white text-3xl opacity-80" aria-hidden="true"></i>
+                        </div>
+                        <h3 class="text-white text-xl font-bold text-shadow">股票分析</h3>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-gray-600 mb-4">获取专业的股票市场分析和投资建议。</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-success font-medium">点击使用</span>
+                            <i class="fa fa-arrow-right text-success" aria-hidden="true"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Web服务控制卡片 -->
+                <div class="function-card bg-white rounded-xl shadow-card hover:shadow-card-hover transform hover:-translate-y-1 transition-all-300 overflow-hidden cursor-pointer focus:outline-none focus:ring-2 focus:ring-warning/50"
+                    data-target="web-service-modal" role="gridcell" tabindex="0" aria-label="Web服务控制工具">
+                    <div class="h-48 card-gradient from-warning/90 to-warning p-6 flex flex-col justify-between">
+                        <div class="flex justify-end">
+                            <i class="fa fa-server text-white text-3xl opacity-80" aria-hidden="true"></i>
+                        </div>
+                        <h3 class="text-white text-xl font-bold text-shadow">启动/关闭Web服务</h3>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-gray-600 mb-4">控制Playwright浏览器服务的启动和关闭。</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-warning font-medium">点击使用</span>
+                            <i class="fa fa-arrow-right text-warning" aria-hidden="true"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 豆包搜索卡片 -->
+                <div class="function-card bg-white rounded-xl shadow-card hover:shadow-card-hover transform hover:-translate-y-1 transition-all-300 overflow-hidden cursor-pointer focus:outline-none focus:ring-2 focus:ring-info/50"
+                    data-target="doubao-modal" role="gridcell" tabindex="0" aria-label="豆包搜索工具">
+                    <div class="h-48 card-gradient from-info/90 to-info p-6 flex flex-col justify-between">
+                        <div class="flex justify-end">
+                            <i class="fa fa-search text-white text-3xl opacity-80" aria-hidden="true"></i>
+                        </div>
+                        <h3 class="text-white text-xl font-bold text-shadow">豆包搜索</h3>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-gray-600 mb-4">输入关键词，获取豆包AI的智能搜索结果。</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-info font-medium">点击使用</span>
+                            <i class="fa fa-arrow-right text-info" aria-hidden="true"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 获取实时资讯卡片 -->
+                <div class="function-card bg-white rounded-xl shadow-card hover:shadow-card-hover transform hover:-translate-y-1 transition-all-300 overflow-hidden cursor-pointer focus:outline-none focus:ring-2 focus:ring-yellow-500/50"
+                    data-target="get-real-time-news" role="gridcell" tabindex="0" aria-label="获取实时资讯工具">
+                    <div class="h-48 card-gradient from-[#FFC107]/90 to-[#FFC107] p-6 flex flex-col justify-between">
+                        <div class="flex justify-end">
+                            <i class="fa fa-newspaper-o text-white text-3xl opacity-80" aria-hidden="true"></i>
+                        </div>
+                        <h3 class="text-white text-xl font-bold text-shadow">获取实时资讯</h3>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-gray-600 mb-4">获取最新的实时资讯。</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-[#FFC107] font-medium">点击使用</span>
+                            <i class="fa fa-arrow-right text-[#FFC107]" aria-hidden="true"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 量化训练卡片 -->
+                <div class="function-card bg-white rounded-xl shadow-card hover:shadow-card-hover transform hover:-translate-y-1 transition-all-300 overflow-hidden cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                    role="gridcell" tabindex="0" aria-label="量化训练工具">
+                    <div class="h-48 card-gradient from-[#9C27B0]/90 to-[#9C27B0] p-6 flex flex-col justify-between">
+                        <div class="flex justify-end">
+                            <i class="fa fa-calculator text-white text-3xl opacity-80" aria-hidden="true"></i>
+                        </div>
+                        <h3 class="text-white text-xl font-bold text-shadow">量化训练</h3>
+                    </div>
+                    <div class="p-6 space-y-4">
+                        <button id="xgb-training"
+                            class="w-full bg-[#9C27B0] hover:bg-[#9C27B0]/90 text-white px-6 py-2 rounded-lg transition-all-300 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-purple-500/50">
+                            <i class="fa fa-play mr-2" aria-hidden="true"></i>
+                            xgb训练
+                        </button>
+                        <button id="lgbm-training"
+                            class="w-full bg-[#9C27B0] hover:bg-[#9C27B0]/90 text-white px-6 py-2 rounded-lg transition-all-300 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-purple-500/50">
+                            <i class="fa fa-play mr-2" aria-hidden="true"></i>
+                            lgbm训练
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 获取咨询股票分析卡片 -->
+                <div class="function-card bg-white rounded-xl shadow-card hover:shadow-card-hover transform hover:-translate-y-1 transition-all-300 overflow-hidden cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                    data-target="get-stock-analysis" role="gridcell" tabindex="0" aria-label="获取咨询股票分析工具">
+                    <div class="h-48 card-gradient from-[#03A9F4]/90 to-[#03A9F4] p-6 flex flex-col justify-between">
+                        <div class="flex justify-end">
+                            <i class="fa fa-bar-chart text-white text-3xl opacity-80" aria-hidden="true"></i>
+                        </div>
+                        <h3 class="text-white text-xl font-bold text-shadow">获取咨询股票分析</h3>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-gray-600 mb-4">获取专业的咨询股票分析结果。</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-[#03A9F4] font-medium">点击使用</span>
+                            <i class="fa fa-arrow-right text-[#03A9F4]" aria-hidden="true"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 潜在博主筛选卡片 -->
+                <div class="function-card bg-white rounded-xl shadow-card hover:shadow-card-hover transform hover:-translate-y-1 transition-all-300 overflow-hidden cursor-pointer focus:outline-none focus:ring-2 focus:ring-pink-500/50"
+                    onclick="window.location.href='/blogger-filter'" role="gridcell" tabindex="0" aria-label="潜在博主筛选">
+                    <div class="h-48 card-gradient from-[#E91E63]/90 to-[#E91E63] p-6 flex flex-col justify-between">
+                        <div class="flex justify-end">
+                            <i class="fa fa-filter text-white text-3xl opacity-80" aria-hidden="true"></i>
+                        </div>
+                        <h3 class="text-white text-xl font-bold text-shadow">潜在博主筛选</h3>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-gray-600 mb-4">查看并发掘到的博主，进行二次筛选。</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-[#E91E63] font-medium">点击进入</span>
+                            <i class="fa fa-arrow-right text-[#E91E63]" aria-hidden="true"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-dark text-white py-10" role="contentinfo">
+        <div class="container mx-auto px-4">
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-500">
+                <p>© 2025 多功能工具箱 版权所有</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 小红书文案生成弹窗 -->
+    <div id="xhs-modal" class="modal fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden"
+        role="dialog" aria-labelledby="xhs-modal-title" aria-hidden="true">
+        <div class="modal-content bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto transform transition-all duration-300 scale-95 opacity-0"
+            id="xhs-modal-content">
+            <div class="p-6 border-b">
+                <div class="flex justify-between items-center">
+                    <h3 id="xhs-modal-title" class="text-xl font-bold text-dark">小红书文案生成</h3>
+                    <button
+                        class="close-modal text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary/50 rounded"
+                        aria-label="关闭弹窗">
+                        <i class="fa fa-times text-xl" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="p-6">
+                <div class="mb-6">
+                    <label for="xhs-content" class="block text-gray-700 font-medium mb-2">输入产品描述</label>
+                    <textarea id="xhs-content"
+                        class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all-300"
+                        rows="4" placeholder="请输入产品的详细描述..." aria-describedby="xhs-content-help"></textarea>
+                    <div id="xhs-content-help" class="text-sm text-gray-500 mt-1">请详细描述您的产品特点和卖点</div>
+                </div>
+                <div class="flex justify-end">
+                    <button id="xhs-submit"
+                        class="bg-primary hover:bg-primary/90 text-white px-6 py-2 rounded-lg transition-all-300 flex items-center focus:outline-none focus:ring-2 focus:ring-primary/50">
+                        <i class="fa fa-paper-plane mr-2" aria-hidden="true"></i>
+                        生成文案
+                    </button>
+                </div>
+                <div id="xhs-result-container" class="mt-8 hidden">
+                    <h4 class="text-lg font-medium text-gray-700 mb-3">生成结果</h4>
+                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 min-h-[150px]" id="xhs-result"
+                        role="region" aria-live="polite">
+                        <!-- 结果将在这里显示 -->
+                    </div>
+                    <div class="flex justify-end mt-4">
+                        <button id="xhs-copy"
+                            class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg transition-all-300 flex items-center focus:outline-none focus:ring-2 focus:ring-gray-400/50">
+                            <i class="fa fa-copy mr-2" aria-hidden="true"></i>
+                            复制结果
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 豆包搜索弹窗 -->
+    <div id="doubao-modal" class="modal fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden"
+        role="dialog" aria-labelledby="doubao-modal-title" aria-hidden="true">
+        <div class="modal-content bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto transform transition-all duration-300 scale-95 opacity-0"
+            id="doubao-modal-content">
+            <div class="p-6 border-b">
+                <div class="flex justify-between items-center">
+                    <h3 id="doubao-modal-title" class="text-xl font-bold text-dark">豆包搜索</h3>
+                    <button
+                        class="close-modal text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary/50 rounded"
+                        aria-label="关闭弹窗">
+                        <i class="fa fa-times text-xl" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="p-6">
+                <div class="mb-6">
+                    <label for="doubao-content" class="block text-gray-700 font-medium mb-2">输入搜索关键词</label>
+                    <textarea id="doubao-content"
+                        class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all-300"
+                        rows="4" placeholder="请输入搜索关键词..." aria-describedby="doubao-content-help"></textarea>
+                    <div id="doubao-content-help" class="text-sm text-gray-500 mt-1">输入您想要搜索的关键词或问题</div>
+                </div>
+                <div class="flex justify-end">
+                    <button id="doubao-submit"
+                        class="bg-info hover:bg-info/90 text-white px-6 py-2 rounded-lg transition-all-300 flex items-center focus:outline-none focus:ring-2 focus:ring-info/50">
+                        <i class="fa fa-search mr-2" aria-hidden="true"></i>
+                        搜索
+                    </button>
+                </div>
+                <div id="doubao-result-container" class="mt-8 hidden">
+                    <h4 class="text-lg font-medium text-gray-700 mb-3">搜索结果</h4>
+                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 min-h-[150px]" id="doubao-result"
+                        role="region" aria-live="polite">
+                        <!-- 结果将在这里显示 -->
+                    </div>
+                    <div class="flex justify-end mt-4">
+                        <button id="doubao-copy"
+                            class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg transition-all-300 flex items-center focus:outline-none focus:ring-2 focus:ring-gray-400/50">
+                            <i class="fa fa-copy mr-2" aria-hidden="true"></i>
+                            复制结果
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Web服务控制弹窗 -->
+    <div id="web-service-modal" class="modal fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden"
+        role="dialog" aria-labelledby="web-service-modal-title" aria-hidden="true">
+        <div class="modal-content bg-white rounded-xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto transform transition-all duration-300 scale-95 opacity-0"
+            id="web-service-modal-content">
+            <div class="p-6 border-b">
+                <div class="flex justify-between items-center">
+                    <h3 id="web-service-modal-title" class="text-xl font-bold text-dark">Web服务控制</h3>
+                    <button
+                        class="close-modal text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary/50 rounded"
+                        aria-label="关闭弹窗">
+                        <i class="fa fa-times text-xl" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="p-6">
+                <p class="text-gray-700 mb-6">
+                    控制Playwright浏览器服务的启动和关闭。启动服务后，您可以使用其他需要浏览器自动化的功能。
+                </p>
+                <div class="space-y-4">
+                    <button id="start-web-service"
+                        class="w-full bg-success hover:bg-success/90 text-white px-6 py-3 rounded-lg transition-all-300 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-success/50">
+                        <i class="fa fa-play mr-2" aria-hidden="true"></i>
+                        启动Web服务
+                    </button>
+                    <button id="stop-web-service"
+                        class="w-full bg-danger hover:bg-danger/90 text-white px-6 py-3 rounded-lg transition-all-300 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-danger/50">
+                        <i class="fa fa-stop mr-2" aria-hidden="true"></i>
+                        关闭Web服务
+                    </button>
+                </div>
+                <div id="web-service-status" class="mt-6 p-4 rounded-lg hidden" role="status" aria-live="polite">
+                    <div class="flex items-center">
+                        <div class="loading-spinner mr-3 hidden">
+                            <i class="fa fa-spinner fa-spin" aria-hidden="true"></i>
+                        </div>
+                        <span id="web-service-message">准备就绪</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 全局加载提示 -->
+    <div id="global-loading" class="fixed top-4 right-4 bg-white shadow-lg rounded-lg p-4 z-50 hidden" role="status"
+        aria-live="polite">
+        <div class="flex items-center">
+            <i class="fa fa-spinner fa-spin text-primary mr-3" aria-hidden="true"></i>
+            <span>处理中...</span>
+        </div>
+    </div>
+
+    <!-- 操作结果浮窗 -->
+    <div id="result-toast"
+        class="fixed top-4 right-4 max-w-sm bg-white shadow-lg rounded-lg p-4 z-50 hidden transform translate-x-full transition-transform duration-300"
+        role="alert" aria-live="assertive">
+        <div class="flex items-start">
+            <div class="flex-shrink-0">
+                <i id="toast-icon" class="fa fa-check-circle text-success text-xl" aria-hidden="true"></i>
+            </div>
+            <div class="ml-3 flex-1">
+                <p id="toast-message" class="text-sm font-medium text-gray-900">操作成功</p>
+            </div>
+            <button id="toast-close"
+                class="ml-4 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400/50 rounded"
+                aria-label="关闭提示">
+                <i class="fa fa-times" aria-hidden="true"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // 配置对象
+        const CONFIG = {
+            API_BASE_URL: 'http://127.0.0.1:8000',
+            ENDPOINTS: {
+                XHS_GENERATE: '/generate_xhs_content',
+                DOUBAO_SEARCH: '/doubao_search',
+                GZH_PUBLISH: '/publish_to_gzh',
+                STOCK_ANALYSIS: '/get_stock_analysis',
+                REAL_TIME_NEWS: '/get_real_time_news',
+                STOCK_CONSULTATION: '/get_stock_consultation_analysis',
+                START_WEB_SERVICE: '/start_web_service',
+                STOP_WEB_SERVICE: '/stop_web_service',
+                XGB_TRAINING: '/xgb_training',
+                LGBM_TRAINING: '/lgbm_training'
+            },
+            TIMEOUTS: {
+                DEFAULT: 30000,
+                TRAINING: 120000
+            }
+        };
+
+        // 工具类
+        class Utils {
+            static showLoading() {
+                document.getElementById('global-loading').classList.remove('hidden');
+            }
+
+            static hideLoading() {
+                document.getElementById('global-loading').classList.add('hidden');
+            }
+
+            static showToast(message, type = 'success') {
+                const toast = document.getElementById('result-toast');
+                const icon = document.getElementById('toast-icon');
+                const messageEl = document.getElementById('toast-message');
+
+                // 设置图标和样式
+                if (type === 'success') {
+                    icon.className = 'fa fa-check-circle text-success text-xl';
+                } else if (type === 'error') {
+                    icon.className = 'fa fa-exclamation-circle text-danger text-xl';
+                } else if (type === 'warning') {
+                    icon.className = 'fa fa-exclamation-triangle text-warning text-xl';
+                }
+
+                messageEl.textContent = message;
+                toast.classList.remove('hidden', 'translate-x-full');
+
+                // 自动隐藏
+                setTimeout(() => {
+                    this.hideToast();
+                }, 5000);
+            }
+
+            static hideToast() {
+                const toast = document.getElementById('result-toast');
+                toast.classList.add('translate-x-full');
+                setTimeout(() => {
+                    toast.classList.add('hidden');
+                }, 300);
+            }
+
+            static async copyToClipboard(text) {
+                try {
+                    await navigator.clipboard.writeText(text);
+                    this.showToast('内容已复制到剪贴板');
+                } catch (err) {
+                    console.error('复制失败:', err);
+                    this.showToast('复制失败，请手动复制', 'error');
+                }
+            }
+
+            static handleError(error, context = '') {
+                console.error(`${context}错误:`, error);
+                let message = '操作失败，请稍后重试';
+
+                if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                    message = '网络连接失败，请检查网络连接';
+                } else if (error.message) {
+                    message = error.message;
+                }
+
+                this.showToast(message, 'error');
+            }
+        }
+
+        // API调用类
+        class ApiService {
+            static async request(endpoint, options = {}) {
+                const url = `${CONFIG.API_BASE_URL}${endpoint}`;
+                const defaultOptions = {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    timeout: CONFIG.TIMEOUTS.DEFAULT
+                };
+
+                const finalOptions = { ...defaultOptions, ...options };
+
+                try {
+                    Utils.showLoading();
+                    const response = await fetch(url, finalOptions);
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+
+                    const data = await response.json();
+                    return data;
+                } catch (error) {
+                    throw error;
+                } finally {
+                    Utils.hideLoading();
+                }
+            }
+
+            static async post(endpoint, data) {
+                return this.request(endpoint, {
+                    method: 'POST',
+                    body: JSON.stringify(data)
+                });
+            }
+
+            static async get(endpoint) {
+                return this.request(endpoint);
+            }
+        }
+
+        // 模态框管理类
+        class ModalManager {
+            static show(modalId) {
+                const modal = document.getElementById(modalId);
+                const content = modal.querySelector('.modal-content');
+
+                modal.classList.remove('hidden');
+                modal.setAttribute('aria-hidden', 'false');
+
+                // 动画效果
+                setTimeout(() => {
+                    content.classList.remove('scale-95', 'opacity-0');
+                    content.classList.add('scale-100', 'opacity-100');
+                }, 10);
+
+                // 焦点管理
+                const firstFocusable = modal.querySelector('button, input, textarea, select');
+                if (firstFocusable) {
+                    firstFocusable.focus();
+                }
+            }
+
+            static hide(modalId) {
+                const modal = document.getElementById(modalId);
+                const content = modal.querySelector('.modal-content');
+
+                content.classList.remove('scale-100', 'opacity-100');
+                content.classList.add('scale-95', 'opacity-0');
+
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                    modal.setAttribute('aria-hidden', 'true');
+
+                    // 重置表单状态
+                    this.resetModalState(modalId);
+                }, 300);
+            }
+
+            static resetModalState(modalId) {
+                if (modalId === 'xhs-modal') {
+                    document.getElementById('xhs-content').value = '';
+                    document.getElementById('xhs-result-container').classList.add('hidden');
+                } else if (modalId === 'doubao-modal') {
+                    document.getElementById('doubao-content').value = '';
+                    document.getElementById('doubao-result-container').classList.add('hidden');
+                }
+            }
+        }
+
+        // 功能处理类
+        class FeatureHandlers {
+            static async handleXhsGenerate() {
+                const content = document.getElementById('xhs-content').value.trim();
+                if (!content) {
+                    Utils.showToast('请输入产品描述', 'warning');
+                    return;
+                }
+
+                try {
+                    const response = await ApiService.post(CONFIG.ENDPOINTS.XHS_GENERATE, { content });
+
+                    document.getElementById('xhs-result').innerHTML = response.result || '生成失败';
+                    document.getElementById('xhs-result-container').classList.remove('hidden');
+                    Utils.showToast('文案生成成功');
+                } catch (error) {
+                    Utils.handleError(error, '小红书文案生成');
+                }
+            }
+
+            static async handleDoubaoSearch() {
+                const content = document.getElementById('doubao-content').value.trim();
+                if (!content) {
+                    Utils.showToast('请输入搜索关键词', 'warning');
+                    return;
+                }
+
+                try {
+                    const response = await ApiService.post(CONFIG.ENDPOINTS.DOUBAO_SEARCH, { content });
+
+                    document.getElementById('doubao-result').innerHTML = response.result || '搜索失败';
+                    document.getElementById('doubao-result-container').classList.remove('hidden');
+                    Utils.showToast('搜索完成');
+                } catch (error) {
+                    Utils.handleError(error, '豆包搜索');
+                }
+            }
+
+            static async handleGzhPublish() {
+                try {
+                    const response = await ApiService.get(CONFIG.ENDPOINTS.GZH_PUBLISH);
+                    Utils.showToast(response.message || '发布成功');
+                } catch (error) {
+                    Utils.handleError(error, '公众号发布');
+                }
+            }
+
+            static async handleStockAnalysis() {
+                try {
+                    const response = await ApiService.get(CONFIG.ENDPOINTS.STOCK_ANALYSIS);
+                    Utils.showToast(response.message || '分析完成');
+                } catch (error) {
+                    Utils.handleError(error, '股票分析');
+                }
+            }
+
+            static async handleRealTimeNews() {
+                try {
+                    const response = await ApiService.get(CONFIG.ENDPOINTS.REAL_TIME_NEWS);
+                    Utils.showToast(response.message || '资讯获取成功');
+                } catch (error) {
+                    Utils.handleError(error, '获取实时资讯');
+                }
+            }
+
+            static async handleStockConsultation() {
+                try {
+                    const response = await ApiService.get(CONFIG.ENDPOINTS.STOCK_CONSULTATION);
+                    Utils.showToast(response.message || '咨询分析完成');
+                } catch (error) {
+                    Utils.handleError(error, '获取咨询股票分析');
+                }
+            }
+
+            static async handleWebService(action) {
+                const endpoint = action === 'start' ? CONFIG.ENDPOINTS.START_WEB_SERVICE : CONFIG.ENDPOINTS.STOP_WEB_SERVICE;
+                const statusEl = document.getElementById('web-service-status');
+                const messageEl = document.getElementById('web-service-message');
+
+                try {
+                    statusEl.classList.remove('hidden');
+                    messageEl.textContent = action === 'start' ? '正在启动服务...' : '正在关闭服务...';
+
+                    const response = await ApiService.get(endpoint);
+                    messageEl.textContent = response.message || `服务${action === 'start' ? '启动' : '关闭'}成功`;
+                    Utils.showToast(response.message || `Web服务${action === 'start' ? '启动' : '关闭'}成功`);
+                } catch (error) {
+                    messageEl.textContent = `服务${action === 'start' ? '启动' : '关闭'}失败`;
+                    Utils.handleError(error, 'Web服务控制');
+                }
+            }
+
+            static async handleTraining(type) {
+                const endpoint = type === 'xgb' ? CONFIG.ENDPOINTS.XGB_TRAINING : CONFIG.ENDPOINTS.LGBM_TRAINING;
+
+                try {
+                    const response = await ApiService.request(endpoint, {
+                        timeout: CONFIG.TIMEOUTS.TRAINING
+                    });
+                    Utils.showToast(response.message || `${type.toUpperCase()}训练完成`);
+                } catch (error) {
+                    Utils.handleError(error, `${type.toUpperCase()}训练`);
+                }
+            }
+        }
+
+        // 事件监听器设置
+        function setupEventListeners() {
+            // 移动端菜单
+            const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileMenuClose = document.getElementById('mobile-menu-close');
+
+            mobileMenuToggle?.addEventListener('click', () => {
+                mobileMenu.classList.add('active');
+            });
+
+            mobileMenuClose?.addEventListener('click', () => {
+                mobileMenu.classList.remove('active');
+            });
+
+            // 点击遮罩关闭菜单
+            document.addEventListener('click', (e) => {
+                if (!mobileMenu.contains(e.target) && !mobileMenuToggle.contains(e.target)) {
+                    mobileMenu.classList.remove('active');
+                }
+            });
+
+            // 功能卡片点击事件
+            document.querySelectorAll('.function-card').forEach(card => {
+                card.addEventListener('click', handleCardClick);
+                card.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleCardClick.call(card, e);
+                    }
+                });
+            });
+
+            // 模态框关闭事件
+            document.querySelectorAll('.close-modal').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const modal = e.target.closest('.modal');
+                    ModalManager.hide(modal.id);
+                });
+            });
+
+            // 点击遮罩关闭模态框
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        ModalManager.hide(modal.id);
+                    }
+                });
+            });
+
+            // ESC键关闭模态框
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    const openModal = document.querySelector('.modal:not(.hidden)');
+                    if (openModal) {
+                        ModalManager.hide(openModal.id);
+                    }
+                }
+            });
+
+            // 表单提交事件
+            document.getElementById('xhs-submit')?.addEventListener('click', FeatureHandlers.handleXhsGenerate);
+            document.getElementById('doubao-submit')?.addEventListener('click', FeatureHandlers.handleDoubaoSearch);
+
+            // 复制按钮事件
+            document.getElementById('xhs-copy')?.addEventListener('click', () => {
+                const result = document.getElementById('xhs-result').textContent;
+                Utils.copyToClipboard(result);
+            });
+
+            document.getElementById('doubao-copy')?.addEventListener('click', () => {
+                const result = document.getElementById('doubao-result').textContent;
+                Utils.copyToClipboard(result);
+            });
+
+            // Web服务控制
+            document.getElementById('start-web-service')?.addEventListener('click', () => {
+                FeatureHandlers.handleWebService('start');
+            });
+
+            document.getElementById('stop-web-service')?.addEventListener('click', () => {
+                FeatureHandlers.handleWebService('stop');
+            });
+
+            // 训练按钮
+            document.getElementById('xgb-training')?.addEventListener('click', () => {
+                FeatureHandlers.handleTraining('xgb');
+            });
+
+            document.getElementById('lgbm-training')?.addEventListener('click', () => {
+                FeatureHandlers.handleTraining('lgbm');
+            });
+
+            // Toast关闭按钮
+            document.getElementById('toast-close')?.addEventListener('click', Utils.hideToast);
+        }
+
+        // 卡片点击处理
+        function handleCardClick(e) {
+            const target = this.dataset.target;
+
+            if (target) {
+                ModalManager.show(target);
+            } else {
+                // 处理直接操作的卡片
+                switch (target) {
+                    case 'gzh-action':
+                        FeatureHandlers.handleGzhPublish();
+                        break;
+                    case 'get-real-time-news':
+                        FeatureHandlers.handleRealTimeNews();
+                        break;
+                    case 'get-stock-analysis':
+                        FeatureHandlers.handleStockConsultation();
+                        break;
+                }
+            }
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            setupEventListeners();
+
+            // 检查浏览器兼容性
+            if (!window.fetch) {
+                Utils.showToast('您的浏览器版本过低，部分功能可能无法正常使用', 'warning');
+            }
+        });
+
+        // 全局错误处理
+        window.addEventListener('error', (e) => {
+            console.error('全局错误:', e.error);
+            Utils.showToast('页面发生错误，请刷新重试', 'error');
+        });
+
+        window.addEventListener('unhandledrejection', (e) => {
+            console.error('未处理的Promise拒绝:', e.reason);
+            Utils.showToast('操作失败，请重试', 'error');
+        });
+    </script>
+</body>
+
+</html>

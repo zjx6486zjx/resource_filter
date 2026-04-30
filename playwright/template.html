@@ -1,0 +1,65 @@
+<div data-v-610be4fa="" data-v-6f638ad4="" class="note-content">
+    <div data-v-610be4fa="" id="detail-title" class="title">AI产品面试题18: 如何减轻大模型的幻觉问题</div>
+    <div data-v-610be4fa="" id="detail-desc" class="desc"><span data-v-610be4fa=""
+            class="note-text"><span>在AI产品中大模型幻觉问题非常普遍，减轻大模型幻觉问题可从技术优化、产品设计、用户交互和持续迭代四个维度综合施策。
+                1. 技术层：增强模型的“事实核查”能力
+                - 检索增强生成（RAG）‌：
+                结合外部知识库（如维基百科、行业数据库）实时检索，确保生成内容基于最新、可信数据。例如，New Bing通过接入搜索引擎实现动态信息整合。
+                - 微调与对齐‌：
+                在预训练后，用高质量标注数据（标注事实性错误）对模型进行微调，强化“不确定时拒绝回答”或“引用来源”的能力。
+                - 置信度评分与阈值控制‌：
+                模型对生成内容输出置信度分数，低置信度时触发回退机制（如切换至检索模式或提示用户核查）。
+                2. 产品层：引导用户合理预期与交互
+                - 明确能力边界‌：
+                在用户界面标注模型局限性（如“可能包含不准确信息”），避免用户过度依赖生成结果。
+                - 实时反馈与标注‌：
+                - 对高风险领域（医疗、法律）的答案自动标注警示，并提供“验证来源”按钮。
+                - 生成内容附带来源引用（如“根据2023年XX研究”），提升可信度。
+                - 用户纠错机制‌：
+                设计一键反馈入口（如“报告错误”），收集幻觉案例用于模型迭代。
+                3. 评估与监控：构建事实性指标体系
+                - 自动化评估‌：
+                引入事实性评测工具（如FactScore、TruthfulQA），定期测试模型在关键领域的准确性。
+                - 人工审核Pipeline‌：
+                对高频场景（如新闻摘要、知识问答）建立抽样审核流程，识别潜在幻觉模式。
+                - 实时监控‌：
+                部署异常检测系统，拦截明显矛盾或反常识内容（如“太阳从西边升起”）。
+                4. 迭代策略：数据与场景的持续优化
+                - 领域自适应‌：
+                针对垂直场景（金融、医疗）补充专业数据，降低开放域幻觉风险。
+                - 多模态融合‌：
+                结合图文、结构化数据等多模态输入，提升上下文理解准确性（如用图表辅助生成财务分析）。
+                - 用户行为分析‌：
+                优化提示设计（如要求用户提供背景信息），减少模糊查询导致的幻觉。
+                ……
+            </span><a data-v-39010cd1="" id="hash-tag" target="_blank" class="tag"
+                href="/search_result?keyword=%25E4%25BA%2592%25E8%2581%2594%25E7%25BD%2591%25E5%25A4%25A7%25E5%258E%2582&amp;type=54&amp;source=web_note_detail_r10">#互联网大厂</a><span>
+            </span><a data-v-39010cd1="" id="hash-tag" target="_blank" class="tag"
+                href="/search_result?keyword=%25E5%25A4%25A7%25E6%25A8%25A1%25E5%259E%258B&amp;type=54&amp;source=web_note_detail_r10">#大模型</a><span>
+            </span><a data-v-39010cd1="" id="hash-tag" target="_blank" class="tag"
+                href="/search_result?keyword=%25E4%25BA%25A7%25E5%2593%2581%25E7%25BB%258F%25E7%2590%2586&amp;type=54&amp;source=web_note_detail_r10">#产品经理</a><span>
+            </span><a data-v-39010cd1="" id="hash-tag" target="_blank" class="tag"
+                href="/search_result?keyword=%25E4%25BA%25A7%25E5%2593%2581%25E7%25BB%258F%25E7%2590%2586%25E9%259D%25A2%25E8%25AF%2595&amp;type=54&amp;source=web_note_detail_r10">#产品经理面试</a><span>
+            </span><a data-v-39010cd1="" id="hash-tag" target="_blank" class="tag"
+                href="/search_result?keyword=%25E9%259D%25A2%25E8%25AF%2595%25E6%258A%2580%25E5%25B7%25A7&amp;type=54&amp;source=web_note_detail_r10">#面试技巧</a><span>
+            </span><a data-v-39010cd1="" id="hash-tag" target="_blank" class="tag"
+                href="/search_result?keyword=AI%25E4%25BA%25A7%25E5%2593%2581%25E7%25BB%258F%25E7%2590%2586&amp;type=54&amp;source=web_note_detail_r10">#AI产品经理</a><span>
+            </span><a data-v-39010cd1="" id="hash-tag" target="_blank" class="tag"
+                href="/search_result?keyword=%25E9%259D%25A2%25E8%25AF%2595%25E9%25A2%2598&amp;type=54&amp;source=web_note_detail_r10">#面试题</a><span>
+            </span><a data-v-39010cd1="" id="hash-tag" target="_blank" class="tag"
+                href="/search_result?keyword=AI&amp;type=54&amp;source=web_note_detail_r10">#AI</a><span> </span><a
+                data-v-39010cd1="" id="hash-tag" target="_blank" class="tag"
+                href="/search_result?keyword=%25E4%25B8%258D%25E6%2587%2582%25E5%25B0%25B1%25E9%2597%25AE%25E6%259C%2589%25E9%2597%25AE%25E5%25BF%2585%25E7%25AD%2594&amp;type=54&amp;source=web_note_detail_r10">#不懂就问有问必答</a><a
+                data-v-39010cd1="" id="hash-tag" target="_blank" class="tag"
+                href="/search_result?keyword=%25E6%25A0%25A1%25E6%258B%259B&amp;type=54&amp;source=web_note_detail_r10">#校招</a></span>
+    </div>
+    <div data-v-610be4fa="" class="bottom-container"><span data-v-610be4fa="" class="date"
+            selected-disabled-search="">编辑于 06-18 </span><!----><span data-v-610be4fa="">
+            <div data-v-63ac5062="" data-v-610be4fa="" class="notedetail-menu" size="16" style="z-index: 9999;">
+                <div data-v-1b03e45c="" data-v-63ac5062="" class="note-detail-dropdown"><svg data-v-55b36ac6=""
+                        data-v-63ac5062="" class="reds-icon more" width="16" height="16">
+                        <use data-v-55b36ac6="" xlink:href="#more"></use>
+                    </svg></div>
+            </div>
+        </span></div>
+</div>

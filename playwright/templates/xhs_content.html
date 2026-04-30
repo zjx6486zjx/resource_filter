@@ -1,0 +1,178 @@
+<html lang="zh-CN"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>灵感笔记 - 发现精彩文字</title>
+    <!-- 引入Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    
+    <!-- 配置Tailwind自定义颜色和字体 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#fe2c55', // 抖音红色调作为主色
+                        secondary: '#1a1a1a',
+                        light: '#f7f7f7',
+                        dark: '#333333'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <!-- 自定义工具类 -->
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            }
+            .card-hover {
+                @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+            }
+            .animate-fade-in {
+                animation: fadeIn 0.5s ease-in-out;
+            }
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans text-dark">
+    <!-- 顶部导航栏 -->
+    <header class="sticky top-0 z-50 bg-white shadow-sm transition-all duration-300">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <i class="fa fa-feather text-primary text-2xl"></i>
+                <h1 class="text-xl font-bold bg-gradient-to-r from-primary to-pink-500 bg-clip-text text-transparent">灵感笔记</h1>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <div class="relative">
+                    <img src="https://picsum.photos/id/64/200" alt="用户头像" class="w-8 h-8 rounded-full object-cover border-2 border-primary">
+                </div>
+                <button class="md:hidden text-gray-700 hover:text-primary">
+                    <i class="fa fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="container mx-auto px-4 py-6">        
+        <!-- 文本卡片网格 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- 文本卡片1 -->
+            <article class="bg-white rounded-2xl shadow-sm overflow-hidden card-hover animate-fade-in p-6">                    
+                <div>
+                    <h2 class="text-xl font-bold mb-3 text-gray-900">夏日的傍晚</h2>
+                    <p class="text-gray-700 leading-relaxed">
+                        夏日的傍晚总是那么迷人，夕阳把天空染成了橙红色，微风拂过带来一丝凉意。坐在院子里，听着蝉鸣和远处的蛙声，感觉整个世界都慢了下来。
+                    </p>
+                    <p class="text-gray-700 leading-relaxed mt-3">
+                        这时候最适合泡一杯冰镇的柠檬茶，捧一本书，享受这份难得的宁静。生活其实很简单，幸福也藏在这些平凡的瞬间里。
+                    </p>
+                </div>
+            </article>
+            
+            <!-- 文本卡片2 -->
+            <article class="bg-white rounded-2xl shadow-sm overflow-hidden card-hover animate-fade-in p-6" style="animation-delay: 0.1s">                    
+                <div>
+                    <h2 class="text-xl font-bold mb-3 text-gray-900">街角的咖啡馆</h2>
+                    <p class="text-gray-700 leading-relaxed">
+                        偶然发现街角一家不起眼的咖啡馆，推门进去却别有洞天。复古的装修风格，轻柔的爵士乐，空气中弥漫着咖啡豆的香气。
+                    </p>
+                    <p class="text-gray-700 leading-relaxed mt-3">
+                        点了一杯手冲咖啡，坐在靠窗的位置，看着窗外人来人往。原来美好不需要刻意寻找，它就藏在城市的某个角落，等待被发现。
+                    </p>
+                </div>
+            </article>
+            
+            <!-- 文本卡片3 -->
+            <article class="bg-white rounded-2xl shadow-sm overflow-hidden card-hover animate-fade-in p-6" style="animation-delay: 0.2s">                    
+                <div>
+                    <h2 class="text-xl font-bold mb-3 text-gray-900">阅读的意义</h2>
+                    <p class="text-gray-700 leading-relaxed">
+                        阅读不一定能给你带来世俗意义上的成功，但它能让你在独处时不感到孤独，在迷茫时找到方向，在浮躁时获得平静。
+                    </p>
+                    <p class="text-gray-700 leading-relaxed mt-3">
+                        每本书都是一个世界，每一次阅读都是一次旅行。我们在文字中遇见不同的人生，也在别人的故事里，更清楚地认识自己。
+                    </p>
+                    <p class="text-gray-700 leading-relaxed mt-3">
+                        让阅读成为一种习惯，就像吃饭睡觉一样自然。它会在不知不觉中塑造你的思想，丰富你的内心。
+                    </p>
+                </div>
+            </article>
+            
+            <!-- 文本卡片4 -->
+            <article class="bg-white rounded-2xl shadow-sm overflow-hidden card-hover animate-fade-in p-6" style="animation-delay: 0.3s">                    
+                <div>
+                    <h2 class="text-xl font-bold mb-3 text-gray-900">山巅的风景</h2>
+                    <p class="text-gray-700 leading-relaxed">
+                        爬了四个小时的山，中途无数次想放弃。双腿像灌了铅一样沉重，呼吸也变得困难。但当我终于站在山顶，看到云海在脚下翻腾，阳光洒在身上的那一刻，所有的疲惫都烟消云散了。
+                    </p>
+                    <p class="text-gray-700 leading-relaxed mt-3">
+                        人生就像爬山，过程或许艰难，但山顶的风景值得我们全力以赴。有时候，我们需要的不是能力，而是再坚持一下的勇气。
+                    </p>
+                </div>
+            </article>
+            
+            <!-- 文本卡片5 -->
+            <article class="bg-white rounded-2xl shadow-sm overflow-hidden card-hover animate-fade-in p-6" style="animation-delay: 0.4s">                    
+                <div>
+                    <h2 class="text-xl font-bold mb-3 text-gray-900">一碗热汤的温暖</h2>
+                    <p class="text-gray-700 leading-relaxed">
+                        加班到深夜，拖着疲惫的身体走在街上。城市已经沉睡，只有几家便利店和小吃摊还亮着灯。
+                    </p>
+                    <p class="text-gray-700 leading-relaxed mt-3">
+                        街角的阿姨还在卖馄饨，点了一碗热汤馄饨，看着热气腾腾的汤碗，瞬间感觉温暖了许多。阿姨说："天凉了，多喝点热汤暖暖身子。"简单的一句话，却让我眼眶有些湿润。
+                    </p>
+                    <p class="text-gray-700 leading-relaxed mt-3">
+                        生活中的小确幸，往往就藏在这些不经意的瞬间和陌生人的善意里。
+                    </p>
+                </div>
+            </article>
+            
+            <!-- 文本卡片6 -->
+            <article class="bg-white rounded-2xl shadow-sm overflow-hidden card-hover animate-fade-in p-6" style="animation-delay: 0.5s">                    
+                <div>
+                    <h2 class="text-xl font-bold mb-3 text-gray-900">写给未来的自己</h2>
+                    <p class="text-gray-700 leading-relaxed">
+                        今天写了一封信，寄给一年后的自己。不知道那时的我，是否已经实现了现在的目标？是否依然保持着初心？是否还记得此刻的心情？
+                    </p>
+                    <p class="text-gray-700 leading-relaxed mt-3">
+                        时间过得真快，仿佛昨天还是学生，转眼间已经在职场打拼多年。我们总是在忙碌中忘记停下脚步，看看自己走过的路，想想自己真正想要的是什么。
+                    </p>
+                    <p class="text-gray-700 leading-relaxed mt-3">
+                        希望一年后的我，能够笑着读完这封信，感谢现在努力的自己。
+                    </p>
+                </div>
+            </article>
+        </div>
+    </main>
+    
+    <!-- JavaScript -->
+    <script>
+        // 监听滚动，改变导航栏样式
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('header');
+            if (window.scrollY > 10) {
+                header.classList.add('shadow');
+                header.classList.remove('shadow-sm');
+            } else {
+                header.classList.remove('shadow');
+                header.classList.add('shadow-sm');
+            }
+        });
+    </script>
+</body></html>
