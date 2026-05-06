@@ -259,6 +259,7 @@ class LunarsandApiClient:
         headers: Dict[str, str] = {}
         if self.api_key:
             headers["X-API-Key"] = self.api_key
+            headers["Authorization"] = self.api_key if self.api_key.lower().startswith("bearer ") else f"Bearer {self.api_key}"
         if body is not None:
             encoded_body = json.dumps(body, ensure_ascii=False).encode("utf-8")
             headers["Content-Type"] = "application/json"
