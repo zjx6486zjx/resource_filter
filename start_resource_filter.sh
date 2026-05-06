@@ -117,8 +117,8 @@ show_usage() {
   RESOURCE_FILTER_API_TIMEOUT=120
   RESOURCE_FILTER_API_RETRIES=0
   RESOURCE_FILTER_IMPORT_DELAY=2
-  LUNARSAND_API_BASE=http://127.0.0.1:8000/api
-  LUNARSAND_API_KEY=your-api-key   # 可选；后端要求鉴权时再配置
+  LUNARSAND_API_BASE=http://127.0.0.1:8000/api  # V3 生产可配 https://your-domain.example/api
+  LUNARSAND_API_KEY=your-admin-jwt-or-Bearer-token   # V3 短剧后台登录 JWT；可填纯 token 或 Bearer xxx
 
 示例:
   ./start_resource_filter.sh

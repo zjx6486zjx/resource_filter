@@ -32,7 +32,10 @@ playwright install chromium
 确保 `lunarsand_web` 后端已经启动，并准备好：
 
 - `LUNARSAND_API_BASE`
-- `LUNARSAND_API_KEY`（可选，后端要求鉴权时再配置）
+- `LUNARSAND_API_KEY`（V3 短剧后台登录 JWT；可填纯 token 或 `Bearer xxx`）
+
+V3 生产库建议把 `LUNARSAND_API_BASE` 配到真实反代前缀，例如 `https://your-domain.example/api`。
+导入时会优先请求 `/api/v1/gallery/scrape-items/import`，写入 V3 图库审核队列。
 
 如果目标站点需要登录，优先推荐直接复用 Playwright 持久化用户目录 `--user-data-dir`。这些目录保存登录态和浏览器缓存，只应放在本地，不提交到仓库：
 
@@ -61,7 +64,7 @@ cd /mnt/d/project/resource_filter
 
 ```bash
 LUNARSAND_API_BASE=http://127.0.0.1:8000/api
-LUNARSAND_API_KEY=your-api-key
+LUNARSAND_API_KEY=your-admin-jwt-or-Bearer-token
 RESOURCE_FILTER_SITE=jimeng
 RESOURCE_FILTER_MODE=inspiration
 RESOURCE_FILTER_ENTRY_URL=https://jimeng.jianying.com/ai-tool/home
@@ -122,7 +125,7 @@ cd /mnt/d/project
 python -m resource_filter.cli inspiration \
   --entry-url "https://jimeng.jianying.com/ai-tool/home" \
   --api-base "http://127.0.0.1:8000/api" \
-  --api-key "your-api-key" \  # 可选
+  --api-key "your-admin-jwt-or-Bearer-token" \
   --browser-channel "chrome" \
   --user-data-dir "/mnt/d/project/resource_filter/user_data/jimeng_profile"
 ```
@@ -134,7 +137,7 @@ cd /mnt/d/project
 python -m resource_filter.cli author \
   --author-url "https://jimeng.jianying.com/your-author-page" \
   --api-base "http://127.0.0.1:8000/api" \
-  --api-key "your-api-key" \  # 可选
+  --api-key "your-admin-jwt-or-Bearer-token" \
   --browser-channel "chrome" \
   --user-data-dir "/mnt/d/project/resource_filter/user_data/jimeng_profile"
 ```
@@ -148,7 +151,7 @@ python -m resource_filter.cli --site xhs inspiration \
   --tab-limit 3 \
   --max-items 5 \
   --api-base "http://127.0.0.1:8000/api" \
-  --api-key "your-api-key" \  # 可选
+  --api-key "your-admin-jwt-or-Bearer-token" \
   --browser-channel "chrome" \
   --user-data-dir "/mnt/d/project/resource_filter/user_data/xhs_profile"
 ```
@@ -160,7 +163,7 @@ cd /mnt/d/project
 python -m resource_filter.cli --site xhs author \
   --author-query "橘困（努力拍照中）" \
   --api-base "http://127.0.0.1:8000/api" \
-  --api-key "your-api-key" \  # 可选
+  --api-key "your-admin-jwt-or-Bearer-token" \
   --browser-channel "chrome" \
   --user-data-dir "/mnt/d/project/resource_filter/user_data/xhs_profile"
 ```
